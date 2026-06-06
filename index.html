@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>2M Smart Spare — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -1169,6 +1170,19 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// TELEGRAM MINI APP INIT
+// ═══════════════════════════════════════════════════════════════
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  // Apply Telegram theme colors if available
+  if (tg.themeParams?.bg_color) {
+    document.documentElement.style.setProperty("--navy", tg.themeParams.bg_color);
+  }
+}
+
 // DATA  (pulled from localStorage — synced by bot via Flask)
 // ═══════════════════════════════════════════════════════════════
 
@@ -1542,6 +1556,12 @@ function confirmSale() {
     `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">ID: ${sid}</span>`;
 
   showToast(t('toast_sale_ok'), 'green');
+
+  // Send sale to bot via Telegram Mini App
+  try {
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.sendData) tg.sendData(JSON.stringify({ action: 'log_sale', sale }));
+  } catch(e) { console.warn('tg.sendData:', e); }
 }
 
 function resetSale() {
