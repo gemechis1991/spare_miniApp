@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>2M Smart Spare — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --orange:   #E8500A;
+    --amber:    #F5A623;
+    --navy:     #0B0C1E;
+    --navy2:    #141530;
+    --navy3:    #1E2045;
+    --green:    #27AE60;
+    --blue:     #2980B9;
+    --red:      #E74C3C;
+    --white:    #F0F0F0;
+    --dim:      #8890AA;
+    --border:   rgba(232,80,10,0.25);
+    --glow:     0 0 20px rgba(232,80,10,0.3);
+    --radius:   12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--navy2) 0%, #1a0a00 100%);
+    border-bottom: 2px solid var(--orange);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--glow);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-logo {
+    width: 38px; height: 38px;
+    background: var(--orange);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .brand-text h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    line-height: 1;
+  }
+  .brand-text p {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .header-time {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    line-height: 1.5;
+  }
+  #live-clock { color: var(--amber); font-size: 13px; font-weight: 600; }
+
+  /* ── NAV TABS ── */
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    background: var(--navy2);
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--dim);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    color: var(--orange);
+    border-bottom-color: var(--orange);
+  }
+
+  /* ── MAIN CONTENT ── */
+  main { padding: 16px; max-width: 640px; margin: 0 auto; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeUp .3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── KPI CARDS ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .kpi-card {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--orange);
+  }
+  .kpi-card.green::before  { background: var(--green); }
+  .kpi-card.blue::before   { background: var(--blue); }
+  .kpi-card.amber::before  { background: var(--amber); }
+
+  .kpi-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: var(--white);
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+  .kpi-icon {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 22px;
+    opacity: .4;
+  }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .chart-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: var(--amber);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .chart-wrap { position: relative; height: 190px; }
+
+  /* ── PERIOD SELECTOR ── */
+  .period-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .period-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--navy3);
+    color: var(--dim);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .period-btn.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+  }
+
+  /* ── INVENTORY TABLE ── */
+  .inv-search {
+    width: 100%;
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: var(--white);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    margin-bottom: 10px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .inv-search:focus { border-color: var(--orange); }
+  .inv-search::placeholder { color: var(--dim); }
+
+  .type-filter {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .type-btn {
+    flex: 1;
+    padding: 6px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--navy3);
+    color: var(--dim);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+  }
+  .type-btn.active-ev  { background: rgba(39,174,96,.2); color: var(--green); border-color: var(--green); }
+  .type-btn.active-ic  { background: rgba(41,128,185,.2); color: var(--blue);  border-color: var(--blue); }
+  .type-btn.active-all { background: rgba(232,80,10,.2);  color: var(--orange);border-color: var(--orange); }
+
+  .product-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .product-item {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .product-item:hover { border-color: var(--orange); }
+
+  .stock-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .stock-dot.red    { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .stock-dot.yellow { background: var(--amber); }
+  .stock-dot.green  { background: var(--green); }
+
+  .prod-info { flex: 1; min-width: 0; }
+  .prod-name {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .prod-meta {
+    font-size: 11px;
+    color: var(--dim);
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .prod-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(41,128,185,.2);
+    color: var(--blue);
+  }
+  .prod-badge.ev {
+    background: rgba(39,174,96,.2);
+    color: var(--green);
+  }
+  .prod-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    color: var(--amber);
+    flex-shrink: 0;
+  }
+  .prod-qty {
+    font-size: 11px;
+    color: var(--dim);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── LOG SALE FORM ── */
+  .sale-form {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .sale-form h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    margin-bottom: 16px;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 5px;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--white);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--orange); }
+
+  .payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .payment-opt {
+    padding: 10px;
+    background: var(--navy2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .payment-opt.selected {
+    border-color: var(--orange);
+    background: rgba(232,80,10,.15);
+    color: var(--orange);
+  }
+  .payment-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+
+  .sale-total {
+    background: rgba(232,80,10,.1);
+    border: 1px solid var(--orange);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sale-total-label { font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+  .sale-total-amt {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--orange);
+    letter-spacing: 2px;
+  }
+
+  .btn-confirm {
+    width: 100%;
+    padding: 14px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: var(--glow);
+  }
+  .btn-confirm:hover { background: #ff6320; transform: translateY(-1px); }
+  .btn-confirm:active { transform: translateY(0); }
+  .btn-confirm:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 999;
+    transition: transform .3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  /* ── COACH ── */
+  .coach-area {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .coach-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .coach-avatar {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .coach-title { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 2px; color: var(--orange); }
+  .coach-sub   { font-size: 11px; color: var(--dim); }
+
+  .coach-messages {
+    min-height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .msg {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 85%;
+  }
+  .msg.bot {
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-radius: 4px 12px 12px 12px;
+  }
+  .msg.user {
+    background: rgba(232,80,10,.2);
+    border: 1px solid rgba(232,80,10,.3);
+    align-self: flex-end;
+    border-radius: 12px 4px 12px 12px;
+    color: var(--amber);
+  }
+  .msg.thinking {
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  .coach-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .coach-input {
+    flex: 1;
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--white);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    outline: none;
+  }
+  .coach-input:focus { border-color: var(--orange); }
+  .coach-send {
+    padding: 9px 16px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background .2s;
+  }
+  .coach-send:hover { background: #ff6320; }
+
+  .quick-qs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .quick-q {
+    padding: 4px 10px;
+    border-radius: 16px;
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .quick-q:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ── SECTION TITLES ── */
+  .sec-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+
+  /* ── SALE SUCCESS SCREEN ── */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .success-screen.show { display: block; animation: fadeUp .4s ease; }
+  .success-checkmark {
+    font-size: 60px;
+    margin-bottom: 12px;
+    animation: pop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop {
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
+  }
+  .success-screen h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 3px;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .success-detail {
+    font-size: 13px;
+    color: var(--dim);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .btn-new-sale {
+    padding: 12px 32px;
+    background: var(--navy3);
+    color: var(--orange);
+    border: 1px solid var(--orange);
+    border-radius: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-new-sale:hover { background: var(--orange); color: white; }
+
+  /* ── BEST SALE BANNER ── */
+  .best-sale-banner {
+    background: linear-gradient(135deg, #1a2800 0%, #0f1a00 100%);
+    border: 1.5px solid var(--green);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .best-sale-banner::before {
+    content: '🏆';
+    font-size: 40px;
+    opacity: 0.15;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .best-sale-trophy { font-size: 28px; flex-shrink: 0; }
+  .best-sale-info { flex: 1; min-width: 0; }
+  .best-sale-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 3px;
+  }
+  .best-sale-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--white);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .best-sale-meta {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 3px;
+  }
+  .best-sale-rev {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--green);
+    letter-spacing: 1px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── CONSIGNMENT SECTION ── */
+  .consign-card {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .consign-supplier {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .consign-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .consign-item:last-child { border-bottom: none; }
+  .consign-item-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; }
+  .consign-item-sub { font-size: 10px; color: var(--dim); }
+  .consign-split {
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 10px;
+  }
+  .consign-split-pct { font-size: 13px; color: var(--green); font-weight: 700; }
+  .consign-split-amt { font-size: 10px; color: var(--dim); }
+  .settle-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--green), #1a8040);
+    color: white;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: opacity .2s;
+  }
+  .settle-btn:hover { opacity: 0.85; }
+  .settle-summary {
+    background: var(--navy3);
+    border: 1px solid var(--green);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .settle-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .settle-row:last-child { border-bottom: none; font-weight: 700; color: var(--green); }
+
+  /* ── PAYMENT / SUBSCRIPTION ── */
+  .payment-section {
+    background: var(--navy3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .payment-section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+  .chapa-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #00875A, #005C3B);
+    color: white;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .15s, opacity .2s;
+    margin-bottom: 12px;
+  }
+  .chapa-btn:hover { transform: scale(1.02); }
+  .chapa-logo { font-size: 20px; }
+  .qr-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px;
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .qr-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    color: #333;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  #qr-code { margin: 4px auto; }
+  .qr-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: #005C3B;
+    letter-spacing: 1px;
+  }
+  .sub-tiers { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .sub-tier-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--navy2);
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .sub-tier-card.selected {
+    border-color: var(--orange);
+    background: rgba(232,80,10,.1);
+  }
+  .sub-tier-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--white);
+  }
+  .sub-tier-desc { font-size: 11px; color: var(--dim); margin-top: 2px; }
+  .sub-tier-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--amber);
+    letter-spacing: 1px;
+  }
+  .sub-tier-mo { font-size: 10px; color: var(--dim); }
+
+  /* ── AI CONSULTANT ── */
+  .quick-q.consultant {
+    background: linear-gradient(135deg, rgba(232,80,10,.15), rgba(245,166,35,.1));
+    border-color: rgba(232,80,10,.4);
+    font-size: 12px;
+  }
+  .consultant-badge {
+    display: inline-block;
+    background: var(--orange);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="brand-logo">⚙️</div>
+    <div class="brand-text">
+      <h1>2M Smart Spare</h1>
+      <p>Addis Ababa · Auto Parts</p>
+    </div>
+  </div>
+  <div class="header-time">
+    <div id="live-clock">00:00:00</div>
+    <div id="live-date">—</div>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+  <button class="tab-btn" onclick="showTab('inventory')">📦 Inventory</button>
+  <button class="tab-btn" onclick="showTab('sale')">🧾 Log Sale</button>
+  <button class="tab-btn" onclick="showTab('coach')">🤖 AI Coach</button>
+  <button class="tab-btn" onclick="showTab('consignment')">🤝 Consignment</button>
+  <button class="tab-btn" onclick="showTab('payment')">💳 Payment</button>
+</nav>
+
+<main>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div id="tab-dashboard" class="section active">
+    <div class="period-bar">
+      <button class="period-btn active" onclick="setPeriod('daily',this)">Today</button>
+      <button class="period-btn" onclick="setPeriod('weekly',this)">Week</button>
+      <button class="period-btn" onclick="setPeriod('monthly',this)">Month</button>
+    </div>
+
+    <!-- Best Sale of the Week -->
+    <div class="best-sale-banner" id="best-sale-banner" style="display:none">
+      <div class="best-sale-trophy">🏆</div>
+      <div class="best-sale-info">
+        <div class="best-sale-label">Best Sale · This Week</div>
+        <div class="best-sale-name" id="best-sale-name">—</div>
+        <div class="best-sale-meta" id="best-sale-meta">—</div>
+      </div>
+      <div class="best-sale-rev" id="best-sale-rev">—</div>
+    </div>
+
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value" id="kpi-rev">—</div>
+        <div class="kpi-sub">ETB</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">🧾</div>
+        <div class="kpi-label">Transactions</div>
+        <div class="kpi-value" id="kpi-txn">—</div>
+        <div class="kpi-sub">sales logged</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-label">Units Sold</div>
+        <div class="kpi-value" id="kpi-units">—</div>
+        <div class="kpi-sub">parts out the door</div>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-label">Low Stock</div>
+        <div class="kpi-value" id="kpi-low">—</div>
+        <div class="kpi-sub">items need reorder</div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Payment Method</div>
+      <div class="chart-wrap">
+        <canvas id="chart-payment"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Top 5 Products</div>
+      <div class="chart-wrap">
+        <canvas id="chart-products"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Daily Revenue Trend</div>
+      <div class="chart-wrap">
+        <canvas id="chart-trend"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INVENTORY ══ -->
+  <div id="tab-inventory" class="section">
+    <div class="sec-title">📦 Inventory</div>
+    <input class="inv-search" id="inv-search" placeholder="🔍 Search by name, SKU, category…" oninput="filterInventory()"/>
+
+    <div class="type-filter">
+      <div class="type-btn active-all" onclick="setTypeFilter('all',this)">⚙️ All</div>
+      <div class="type-btn" onclick="setTypeFilter('electric',this)">⚡ EV</div>
+      <div class="type-btn" onclick="setTypeFilter('conventional',this)">🔧 ICE</div>
+    </div>
+
+    <div class="product-list" id="product-list"></div>
+  </div>
+
+  <!-- ══ LOG SALE ══ -->
+  <div id="tab-sale" class="section">
+    <div id="sale-form-wrap">
+      <div class="sale-form">
+        <h2>🧾 Log a Sale</h2>
+
+        <div class="form-group">
+          <label class="form-label">Product</label>
+          <select class="form-select" id="sale-product" onchange="onProductSelect()">
+            <option value="">— Select product —</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="variant-group" style="display:none">
+          <label class="form-label">Variant</label>
+          <select class="form-select" id="sale-variant"></select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Unit Price (ETB)</label>
+          <input class="form-input" type="number" id="sale-price" placeholder="e.g. 1500" min="1" oninput="calcTotal()"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input class="form-input" type="number" id="sale-qty" value="1" min="1" oninput="calcTotal()"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <div class="payment-grid">
+            <div class="payment-opt" onclick="selectPay(this,'Cash')">
+              <span class="payment-icon">💵</span>Cash
+            </div>
+            <div class="payment-opt" onclick="selectPay(this,'Telebirr')">
+              <span class="payment-icon">📱</span>Telebirr
+            </div>
+            <div class="payment-opt" onclick="selectPay(this,'CBE Birr')">
+              <span class="payment-icon">🏦</span>CBE Birr
+            </div>
+            <div class="payment-opt" onclick="selectPay(this,'Bank Transfer')">
+              <span class="payment-icon">🏧</span>Bank Transfer
+            </div>
+          </div>
+        </div>
+
+        <div class="sale-total">
+          <div>
+            <div class="sale-total-label">Total Amount</div>
+            <div class="kpi-sub" id="sale-calc-note">0 units × 0 ETB</div>
+          </div>
+          <div class="sale-total-amt" id="sale-total-display">0 ETB</div>
+        </div>
+
+        <button class="btn-confirm" id="btn-confirm-sale" onclick="confirmSale()" disabled>
+          RECORD SALE ▶
+        </button>
+      </div>
+    </div>
+
+    <div id="sale-success" class="success-screen">
+      <div class="success-checkmark">✅</div>
+      <h2>Sale Recorded!</h2>
+      <div class="success-detail" id="success-detail"></div>
+      <button class="btn-new-sale" onclick="resetSale()">＋ NEW SALE</button>
+    </div>
+  </div>
+
+  <!-- ══ AI COACH ══ -->
+  <div id="tab-coach" class="section">
+    <div class="coach-area">
+      <div class="coach-header">
+        <div class="coach-avatar">🤖</div>
+        <div>
+          <div class="coach-title">AI Business Coach</div>
+          <div class="coach-sub">Powered by Claude · Business Consultant</div>
+        </div>
+      </div>
+
+      <div class="quick-qs">
+        <span class="consultant-badge">AI Consultant</span>
+        <div class="quick-q consultant" onclick="askQuick('Why are my sales lower this week? Diagnose causes from my data and give 5 specific actions to recover immediately.')">📉 Why are sales lower this week?</div>
+        <div class="quick-q" onclick="askQuick('Which products should I restock urgently?')">Restock advice</div>
+        <div class="quick-q" onclick="askQuick('How can I grow EV parts sales in Addis Ababa?')">Grow EV sales</div>
+        <div class="quick-q" onclick="askQuick('What promotions should I run this week?')">Promotions</div>
+        <div class="quick-q" onclick="askQuick('Which payment method is most popular?')">Payment trends</div>
+        <div class="quick-q" onclick="askQuick('Give me pricing advice for my top products.')">Pricing tips</div>
+        <div class="quick-q consultant" onclick="askQuick('Design a promotion strategy for this week based on slow-moving stock and my customer payment preferences.')">💡 Promotions strategy</div>
+        <div class="quick-q consultant" onclick="askQuick('Analyze my consignment items. Which supplier is generating most value? Should I renegotiate any percentage splits?')">🤝 Consignment analysis</div>
+      </div>
+
+      <div class="coach-messages" id="coach-messages">
+        <div class="msg bot">
+          👋 Hello! I'm your 2M Smart Spare business coach. I know your inventory, sales trends, and the Ethiopian auto parts market — including the booming EV segment.<br><br>Ask me anything!
+        </div>
+      </div>
+
+      <div class="coach-input-row">
+        <input class="coach-input" id="coach-input" placeholder="Ask your coach…" onkeydown="if(event.key==='Enter')sendCoach()"/>
+        <button class="coach-send" onclick="sendCoach()">SEND</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONSIGNMENT ══ -->
+  <div id="tab-consignment" class="section">
+    <div class="sec-title">🤝 Consignment Stock</div>
+    <div class="settle-summary">
+      <div class="settle-row">
+        <span>Total consignment items</span>
+        <span id="cs-total-items">—</span>
+      </div>
+      <div class="settle-row">
+        <span>Gross consignment value</span>
+        <span id="cs-total-val">—</span>
+      </div>
+      <div class="settle-row">
+        <span>Shop commission earned</span>
+        <span id="cs-shop-earned">—</span>
+      </div>
+      <div class="settle-row">
+        <span>Owed to suppliers</span>
+        <span id="cs-supplier-owed">—</span>
+      </div>
+    </div>
+    <div id="consignment-list"></div>
+    <button class="settle-btn" onclick="generateSettlementReport()">
+      📋 Generate Settlement Report
+    </button>
+  </div>
+
+  <!-- ══ PAYMENT & SUBSCRIPTION ══ -->
+  <div id="tab-payment" class="section">
+    <div class="payment-section">
+      <div class="payment-section-title">💳 Chapa Payment Link</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input class="form-input" id="chapa-amount" type="number" placeholder="Amount (ETB)" min="1" style="flex:1" oninput="updateQR()"/>
+        <input class="form-input" id="chapa-desc" placeholder="Description" style="flex:2" oninput="updateQR()"/>
+      </div>
+      <button class="chapa-btn" onclick="openChapaLink()">
+        <span class="chapa-logo">🇪🇹</span> PAY WITH CHAPA
+      </button>
+      <div class="qr-wrap" id="qr-section" style="display:none">
+        <div class="qr-label">Scan to Pay</div>
+        <div id="qr-code"></div>
+        <div class="qr-amount" id="qr-amount-label">0 ETB</div>
+        <div style="font-size:10px;color:#666;text-align:center" id="qr-desc-label"></div>
+      </div>
+    </div>
+
+    <div class="payment-section">
+      <div class="payment-section-title">📦 Platform Subscription</div>
+      <div class="sub-tiers" id="sub-tiers"></div>
+      <button class="btn-confirm" id="btn-subscribe" onclick="subscribePlan()" disabled>
+        SUBSCRIBE & PAY ▶
+      </button>
+      <div id="sub-status" style="margin-top:10px;font-size:12px;color:var(--dim);text-align:center"></div>
+    </div>
+  </div>
+
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA  (pulled from localStorage — synced by bot via Flask)
+// ═══════════════════════════════════════════════════════════════
+
+const CURRENCY = "ETB";
+const LOW_STOCK_AT = 3;
+
+// ── Default demo data (matches bot DEFAULT_PRODUCTS) ─────────
+const DEFAULT_PRODUCTS = {
+  "ev-001": { id:"ev-001", name:"BYD Atto 3 — 12V Aux Battery", category:"EV Electrical", price:3200, qty:5, variants:["Genuine OEM","Compatible"], sku:"EV-BAT-ATTO3-12V", vehicle_type:"electric" },
+  "ev-002": { id:"ev-002", name:"EV Charging Cable — Type 2 (7kW)", category:"EV Charging", price:8500, qty:8, variants:["5m","7m","10m"], sku:"EV-CABLE-T2-7KW", vehicle_type:"electric" },
+  "ev-003": { id:"ev-003", name:"Changan Lumin — Front Brake Pads (EV)", category:"EV Brakes", price:2100, qty:12, variants:["Standard","Ceramic"], sku:"EV-BP-LUMIN-F", vehicle_type:"electric" },
+  "ev-004": { id:"ev-004", name:"SAIC MG ZS EV — DC-DC Converter", category:"EV Electrical", price:15400, qty:2, variants:["OEM"], sku:"EV-DCDC-MGZS", vehicle_type:"electric" },
+  "ev-005": { id:"ev-005", name:"Tesla Model 3 — Cabin Air Filter", category:"EV Interior", price:1850, qty:20, variants:["Standard HEPA","Carbon HEPA"], sku:"EV-CAF-MODEL3", vehicle_type:"electric" },
+  "ev-006": { id:"ev-006", name:"EV Coolant (OAT) — 5 Litre", category:"EV Fluids", price:1200, qty:30, variants:["Blue","Pink"], sku:"EV-COOL-OAT5L", vehicle_type:"electric" },
+  "ev-007": { id:"ev-007", name:"BYD Han — Wiper Blade Set", category:"EV Exterior", price:780, qty:15, variants:["OEM"], sku:"EV-WIP-HAN", vehicle_type:"electric" },
+  "ic-001": { id:"ic-001", name:"Toyota Land Cruiser 200 — Oil Filter", category:"Engine", price:650, qty:40, variants:["Genuine Toyota","Mann Filter","Bosch"], sku:"IC-OIL-LC200", vehicle_type:"conventional" },
+  "ic-002": { id:"ic-002", name:"Toyota Hilux Vigo — Timing Belt Kit", category:"Engine", price:5800, qty:7, variants:["Gates","Continental","GMB"], sku:"IC-TB-VIGO", vehicle_type:"conventional" },
+  "ic-003": { id:"ic-003", name:"Hyundai Tucson 2022 — Front Shock Absorber", category:"Suspension", price:7200, qty:4, variants:["KYB","Monroe","Bilstein"], sku:"IC-SHK-TUCSON22-F", vehicle_type:"conventional" },
+  "ic-004": { id:"ic-004", name:"Isuzu D-MAX — Air Filter", category:"Engine", price:480, qty:25, variants:["OEM Isuzu","Bosch","K&N"], sku:"IC-AIR-DMAX", vehicle_type:"conventional" },
+  "ic-005": { id:"ic-005", name:"Honda CR-V 2020 — Rear Brake Disc & Pad Set", category:"Brakes", price:6400, qty:6, variants:["Brembo","Textar","ATE"], sku:"IC-BRK-CRV20-R", vehicle_type:"conventional" },
+  "ic-006": { id:"ic-006", name:"Nissan Patrol Y62 — Alternator", category:"Electrical", price:12500, qty:3, variants:["Remanufactured","OEM Nissan"], sku:"IC-ALT-Y62", vehicle_type:"conventional" },
+  "ic-007": { id:"ic-007", name:"Mitsubishi Pajero — Serpentine Belt", category:"Engine", price:820, qty:18, variants:["Gates","Dayco"], sku:"IC-SB-PAJERO", vehicle_type:"conventional" },
+  "ic-008": { id:"ic-008", name:"VW Polo 2019 — Spark Plug Set (4pc)", category:"Engine", price:1560, qty:22, variants:["NGK","Bosch","Denso"], sku:"IC-SP-POLO19", vehicle_type:"conventional" },
+  "ic-009": { id:"ic-009", name:"Ford Ranger — Radiator (Aluminum)", category:"Cooling", price:9800, qty:2, variants:["OEM","Aftermarket HD"], sku:"IC-RAD-RANGER", vehicle_type:"conventional" },
+  "ic-010": { id:"ic-010", name:"Engine Oil 5W-30 Full Synthetic (4L)", category:"Fluids", price:1380, qty:60, variants:["Castrol","Mobil 1","Liqui-Moly"], sku:"IC-OIL-5W30-4L", vehicle_type:"conventional" },
+};
+
+// ── In-memory state ───────────────────────────────────────────
+let products = { ...DEFAULT_PRODUCTS };
+let sales    = {};
+let currentPeriod = 'daily';
+let selectedPayment = '';
+let typeFilter = 'all';
+let charts = {};
+
+function getProducts() { return products; }
+
+function getSalesForPeriod(period) {
+  const now   = new Date();
+  let   start = new Date(now);
+  if (period === 'daily') {
+    start.setHours(0,0,0,0);
+  } else if (period === 'weekly') {
+    const d = now.getDay();
+    start.setDate(now.getDate() - (d === 0 ? 6 : d - 1));
+    start.setHours(0,0,0,0);
+  } else {
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  return Object.values(sales).filter(s => new Date(s.timestamp) >= start);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════════════════
+
+function updateClock() {
+  const now = new Date();
+  const eat = new Date(now.getTime() + (3 * 3600000));
+  const hh  = eat.getUTCHours().toString().padStart(2,'0');
+  const mm  = eat.getUTCMinutes().toString().padStart(2,'0');
+  const ss  = eat.getUTCSeconds().toString().padStart(2,'0');
+  document.getElementById('live-clock').textContent = `${hh}:${mm}:${ss} EAT`;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('live-date').textContent =
+    `${days[eat.getUTCDay()]} ${eat.getUTCDate()} ${months[eat.getUTCMonth()]} ${eat.getUTCFullYear()}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'inventory') renderInventory();
+  if (id === 'sale')        populateSaleProducts();
+  if (id === 'consignment') renderConsignment();
+  if (id === 'payment')     renderPaymentTab();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+
+function setPeriod(p, btn) {
+  currentPeriod = p;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const s    = getSalesForPeriod(currentPeriod);
+  const prods = getProducts();
+
+  const totalRev   = s.reduce((a,x) => a + (x.total || 0), 0);
+  const totalUnits = s.reduce((a,x) => a + (x.qty   || 0), 0);
+  const lowCount   = Object.values(prods).filter(p => p.qty <= LOW_STOCK_AT).length;
+
+  document.getElementById('kpi-rev').textContent   = fmtNum(totalRev);
+  document.getElementById('kpi-txn').textContent   = s.length;
+  document.getElementById('kpi-units').textContent  = totalUnits;
+  document.getElementById('kpi-low').textContent    = lowCount;
+
+  renderBestSaleOfWeek();
+
+  renderPaymentChart(s);
+  renderProductChart(s);
+  renderTrendChart(s);
+}
+
+const ORANGE = '#E8500A';
+const AMBER  = '#F5A623';
+const NAVY   = '#1E2045';
+const GREEN  = '#27AE60';
+const BLUE   = '#2980B9';
+const PURPLE = '#8E44AD';
+const DIM    = '#8890AA';
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function renderPaymentChart(s) {
+  destroyChart('payment');
+  const byPM = {};
+  s.forEach(sale => { byPM[sale.payment||'Other'] = (byPM[sale.payment||'Other']||0) + (sale.total||0); });
+  const labels = Object.keys(byPM);
+  const values = labels.map(l => byPM[l]);
+  const pmColors = { Cash: ORANGE, Telebirr: AMBER, 'CBE Birr': BLUE, 'Bank Transfer': PURPLE };
+  const colors   = labels.map(l => pmColors[l] || DIM);
+
+  if (!labels.length) return;
+
+  const ctx = document.getElementById('chart-payment').getContext('2d');
+  charts['payment'] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 6, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${fmtNum(ctx.raw)} ETB` } }
+      },
+      scales: {
+        x: { ticks: { color: DIM, font: { family:'Rajdhani', size:11 } }, grid: { display:false }, border:{color:'#333'} },
+        y: { ticks: { color: DIM, font: { family:'JetBrains Mono', size:9 }, callback: v => fmtNum(v) },
+             grid: { color:'rgba(255,255,255,.05)' }, border:{color:'#333'} }
+      }
+    }
+  });
+}
+
+function renderProductChart(s) {
+  destroyChart('products');
+  const byProd = {};
+  s.forEach(sale => { byProd[sale.product_name||'?'] = (byProd[sale.product_name||'?']||0) + (sale.total||0); });
+  const sorted = Object.entries(byProd).sort((a,b) => b[1]-a[1]).slice(0,5);
+  if (!sorted.length) return;
+
+  const ctx = document.getElementById('chart-products').getContext('2d');
+  charts['products'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(x => x[0].substring(0,28)),
+      datasets: [{ data: sorted.map(x => x[1]),
+        backgroundColor: [ORANGE, AMBER, GREEN, BLUE, PURPLE],
+        borderColor: NAVY, borderWidth: 3, hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: { position:'bottom', labels:{ color:DIM, font:{family:'Rajdhani',size:10}, boxWidth:10 } },
+        tooltip: { callbacks: { label: ctx => `${fmtNum(ctx.raw)} ETB` } }
+      }
+    }
+  });
+}
+
+function renderTrendChart(s) {
+  destroyChart('trend');
+  const byDay = {};
+  s.forEach(sale => {
+    const d = sale.timestamp ? sale.timestamp.substring(5,10) : '??';
+    byDay[d] = (byDay[d]||0) + (sale.total||0);
+  });
+  const days  = Object.keys(byDay).sort();
+  const vals  = days.map(d => byDay[d]);
+  if (days.length < 1) return;
+
+  const ctx = document.getElementById('chart-trend').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,'rgba(232,80,10,.35)');
+  grad.addColorStop(1,'rgba(232,80,10,0)');
+
+  charts['trend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{
+        data: vals, borderColor: ORANGE, backgroundColor: grad,
+        fill: true, tension: 0.4, pointBackgroundColor: AMBER,
+        pointRadius: 4, pointHoverRadius: 6, borderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => `${fmtNum(ctx.raw)} ETB` } } },
+      scales: {
+        x: { ticks:{color:DIM,font:{family:'Rajdhani',size:10}}, grid:{display:false}, border:{color:'#333'} },
+        y: { ticks:{color:DIM,font:{family:'JetBrains Mono',size:9}, callback:v=>fmtNum(v)},
+             grid:{color:'rgba(255,255,255,.05)'}, border:{color:'#333'} }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INVENTORY
+// ═══════════════════════════════════════════════════════════════
+
+function setTypeFilter(type, btn) {
+  typeFilter = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.className = 'type-btn');
+  btn.classList.add(type==='all'?'active-all':type==='electric'?'active-ev':'active-ic');
+  filterInventory();
+}
+
+function filterInventory() {
+  const term = document.getElementById('inv-search').value.toLowerCase();
+  const prods = Object.values(getProducts());
+  const filtered = prods.filter(p => {
+    const matchType = typeFilter==='all' || p.vehicle_type===typeFilter;
+    const matchTerm = !term || p.name.toLowerCase().includes(term) ||
+                      p.sku.toLowerCase().includes(term) || p.category.toLowerCase().includes(term);
+    return matchType && matchTerm;
+  });
+  renderProductList(filtered);
+}
+
+function renderInventory() {
+  filterInventory();
+}
+
+function renderProductList(prods) {
+  const el = document.getElementById('product-list');
+  if (!prods.length) {
+    el.innerHTML = '<div style="color:var(--dim);text-align:center;padding:30px">No products found.</div>';
+    return;
+  }
+  el.innerHTML = prods.map(p => {
+    const dot = p.qty <= LOW_STOCK_AT ? 'red' : p.qty <= 10 ? 'yellow' : 'green';
+    const evBadge = p.vehicle_type==='electric'
+      ? '<span class="prod-badge ev">⚡ EV</span>'
+      : '<span class="prod-badge">🔧 ICE</span>';
+    return `
+      <div class="product-item">
+        <div class="stock-dot ${dot}"></div>
+        <div class="prod-info">
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-meta">
+            ${evBadge}
+            <span>${p.category}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px">${p.sku}</span>
+          </div>
+          ${p.variants?.length ? `<div style="font-size:10px;color:var(--dim);margin-top:2px">🎛 ${p.variants.join(' · ')}</div>` : ''}
+        </div>
+        <div>
+          <div class="prod-price">${fmtNum(p.price)}</div>
+          <div class="prod-qty">Qty: ${p.qty}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOG SALE
+// ═══════════════════════════════════════════════════════════════
+
+function populateSaleProducts() {
+  const sel  = document.getElementById('sale-product');
+  const prods = Object.values(getProducts());
+  sel.innerHTML = '<option value="">— Select product —</option>' +
+    prods.map(p => `<option value="${p.id}" data-price="${p.price}" data-variants='${JSON.stringify(p.variants||[])}'>
+      ${p.name} (${fmtNum(p.price)} ETB)
+    </option>`).join('');
+}
+
+function onProductSelect() {
+  const sel  = document.getElementById('sale-product');
+  const opt  = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return;
+
+  const price    = parseFloat(opt.dataset.price || 0);
+  const variants = JSON.parse(opt.dataset.variants || '[]');
+
+  document.getElementById('sale-price').value = price;
+
+  const vgroup = document.getElementById('variant-group');
+  const vsel   = document.getElementById('sale-variant');
+  if (variants.length > 0) {
+    vsel.innerHTML = variants.map(v => `<option>${v}</option>`).join('');
+    vgroup.style.display = 'block';
+  } else {
+    vgroup.style.display = 'none';
+  }
+  calcTotal();
+}
+
+function selectPay(el, method) {
+  document.querySelectorAll('.payment-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPayment = method;
+  validateSaleForm();
+}
+
+function calcTotal() {
+  const price = parseFloat(document.getElementById('sale-price').value) || 0;
+  const qty   = parseInt(document.getElementById('sale-qty').value)     || 0;
+  const total = price * qty;
+  document.getElementById('sale-total-display').textContent = `${fmtNum(total)} ETB`;
+  document.getElementById('sale-calc-note').textContent     = `${qty} unit${qty!==1?'s':''} × ${fmtNum(price)} ETB`;
+  validateSaleForm();
+}
+
+function validateSaleForm() {
+  const prod    = document.getElementById('sale-product').value;
+  const price   = parseFloat(document.getElementById('sale-price').value) || 0;
+  const qty     = parseInt(document.getElementById('sale-qty').value)     || 0;
+  const ok      = prod && price > 0 && qty > 0 && selectedPayment;
+  document.getElementById('btn-confirm-sale').disabled = !ok;
+}
+
+function confirmSale() {
+  const prodSel = document.getElementById('sale-product');
+  const prodId  = prodSel.value;
+  const prods   = getProducts();
+  const prod    = prods[prodId];
+  const price   = parseFloat(document.getElementById('sale-price').value);
+  const qty     = parseInt(document.getElementById('sale-qty').value);
+  const variant = document.getElementById('sale-variant').value || 'N/A';
+  const total   = price * qty;
+
+  const sid = 'S-' + Date.now().toString(36).toUpperCase();
+  const sale = {
+    id: sid, timestamp: new Date().toISOString(),
+    product_id: prodId, product_name: prod?.name || prodSel.options[prodSel.selectedIndex]?.text || 'Unknown',
+    variant, unit_price: price, qty, total, payment: selectedPayment,
+  };
+  sales[sid] = sale;
+
+  // Deduct inventory (demo)
+  if (prod) { prods[prodId].qty = Math.max(0, prods[prodId].qty - qty); }
+
+  // Show success
+  document.getElementById('sale-form-wrap').style.display = 'none';
+  const sd = document.getElementById('sale-success');
+  sd.classList.add('show');
+  document.getElementById('success-detail').innerHTML =
+    `<strong>${sale.product_name}</strong><br>` +
+    `${qty} unit${qty!==1?'s':''} × ${fmtNum(price)} ETB<br>` +
+    `<strong>Total: ${fmtNum(total)} ETB</strong> via ${selectedPayment}<br><br>` +
+    `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">ID: ${sid}</span>`;
+
+  showToast('✅ Sale recorded!', 'green');
+}
+
+function resetSale() {
+  document.getElementById('sale-form-wrap').style.display = 'block';
+  document.getElementById('sale-success').classList.remove('show');
+  document.getElementById('sale-product').value = '';
+  document.getElementById('sale-price').value   = '';
+  document.getElementById('sale-qty').value     = '1';
+  document.getElementById('sale-total-display').textContent = '0 ETB';
+  document.getElementById('sale-calc-note').textContent = '0 units × 0 ETB';
+  document.querySelectorAll('.payment-opt').forEach(o => o.classList.remove('selected'));
+  document.getElementById('variant-group').style.display = 'none';
+  selectedPayment = '';
+  validateSaleForm();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AI COACH (calls Anthropic API via proxy)
+// ═══════════════════════════════════════════════════════════════
+
+const COACH_API_URL = '/api/coach';  // Flask endpoint in main bot server
+
+function askQuick(q) {
+  document.getElementById('coach-input').value = q;
+  sendCoach();
+}
+
+async function sendCoach() {
+  const input = document.getElementById('coach-input');
+  const q     = input.value.trim();
+  if (!q) return;
+  input.value = '';
+
+  addMsg(q, 'user');
+  const thinking = addMsg('⏳ Consulting the AI coach…', 'thinking');
+
+  const prods   = getProducts();
+  const monthly = getSalesForPeriod('monthly');
+  const lowItems = Object.values(prods).filter(p => p.qty <= LOW_STOCK_AT).map(p => p.name);
+  const topSellers = {};
+  monthly.forEach(s => { topSellers[s.product_name||'?'] = (topSellers[s.product_name||'?']||0) + (s.total||0); });
+  const topList = Object.entries(topSellers).sort((a,b)=>b[1]-a[1]).slice(0,5)
+    .map(([k,v])=>`${k}: ${fmtNum(v)} ETB`).join('\n');
+
+  const sysPrompt = `You are an expert business consultant for "2M Smart Spare", an auto parts shop in Addis Ababa, Ethiopia. 
+The shop sells EV and conventional vehicle spare parts. Ethiopia's EV market is growing fast (BYD, SAIC MG, Changan dominate).
+Currency: Ethiopian Birr (ETB). Be concise, practical, and bullet-pointed.
+
+INVENTORY: ${Object.values(prods).length} SKUs total
+LOW STOCK (≤3 units): ${lowItems.join(', ') || 'None'}
+MONTHLY TOP SELLERS:\n${topList || 'No sales data yet'}
+MONTHLY TRANSACTION COUNT: ${monthly.length}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sysPrompt,
+        messages: [{ role: 'user', content: q }],
+      })
+    });
+
+    const data = await resp.json();
+    thinking.remove();
+
+    if (data.content && data.content[0]) {
+      addMsg(data.content[0].text, 'bot');
+    } else if (data.error) {
+      addMsg(`⚠️ API error: ${data.error.message}\n\nTip: Set your Anthropic API key in the bot's .env file.`, 'bot');
+    }
+  } catch(e) {
+    thinking.remove();
+    addMsg(
+      '⚠️ Could not reach the AI Coach. In the live bot, this uses the Claude API.\n\nMake sure your API key is configured and the bot server is running.',
+      'bot'
+    );
+  }
+}
+
+function addMsg(text, type) {
+  const box  = document.getElementById('coach-messages');
+  const div  = document.createElement('div');
+  div.className = `msg ${type}`;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+
+function fmtNum(n) {
+  return Math.round(n).toLocaleString();
+}
+
+let toastTimer;
+function showToast(msg, type='green') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+
+(function init() {
+  renderDashboard();
+  populateSaleProducts();
+  renderPaymentTab();
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// BEST SALE OF THE WEEK
+// ═══════════════════════════════════════════════════════════════
+
+function renderBestSaleOfWeek() {
+  const weekly = getSalesForPeriod('weekly');
+  if (!weekly.length) {
+    document.getElementById('best-sale-banner').style.display = 'none';
+    return;
+  }
+
+  // Aggregate revenue per product
+  const byProd = {};
+  weekly.forEach(s => {
+    const k = s.product_name || 'Unknown';
+    if (!byProd[k]) byProd[k] = { rev: 0, qty: 0, txn: 0 };
+    byProd[k].rev += s.total || 0;
+    byProd[k].qty += s.qty  || 0;
+    byProd[k].txn += 1;
+  });
+
+  const sorted  = Object.entries(byProd).sort((a, b) => b[1].rev - a[1].rev);
+  if (!sorted.length) return;
+
+  const [name, info] = sorted[0];
+  const banner = document.getElementById('best-sale-banner');
+  banner.style.display = 'flex';
+  document.getElementById('best-sale-name').textContent =
+    name.length > 36 ? name.substring(0, 36) + '…' : name;
+  document.getElementById('best-sale-meta').textContent =
+    `${info.qty} units · ${info.txn} sale${info.txn !== 1 ? 's' : ''} this week`;
+  document.getElementById('best-sale-rev').textContent =
+    fmtNum(info.rev) + '\nETB';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONSIGNMENT
+// ═══════════════════════════════════════════════════════════════
+
+// Demo consignment data (in production, synced from bot's spare_data/consignment.json)
+let consignmentData = {
+  'CS-DEMO001': {
+    id: 'CS-DEMO001', supplier: 'Dawit Auto Parts Wholesale',
+    product: 'Toyota Land Cruiser 200 — Oil Filter (Genuine)',
+    qty_original: 50, qty_remaining: 32,
+    price: 680, supplier_pct: 70, shop_pct: 30,
+    date_added: new Date(Date.now() - 15*86400000).toISOString(),
+    settled: false,
+    sales_log: [
+      { qty: 10, total: 6800 }, { qty: 5, total: 3400 }, { qty: 3, total: 2040 }
+    ]
+  },
+  'CS-DEMO002': {
+    id: 'CS-DEMO002', supplier: 'Dawit Auto Parts Wholesale',
+    product: 'Isuzu D-MAX — Air Filter (OEM)',
+    qty_original: 30, qty_remaining: 18,
+    price: 520, supplier_pct: 70, shop_pct: 30,
+    date_added: new Date(Date.now() - 10*86400000).toISOString(),
+    settled: false,
+    sales_log: [{ qty: 12, total: 6240 }]
+  },
+  'CS-DEMO003': {
+    id: 'CS-DEMO003', supplier: 'EV Parts Ethiopia PLC',
+    product: 'BYD Atto 3 — 12V Aux Battery (Compatible)',
+    qty_original: 20, qty_remaining: 14,
+    price: 3000, supplier_pct: 75, shop_pct: 25,
+    date_added: new Date(Date.now() - 7*86400000).toISOString(),
+    settled: false,
+    sales_log: [{ qty: 6, total: 18000 }]
+  }
+};
+
+function renderConsignment() {
+  const data    = consignmentData;
+  const active  = Object.values(data).filter(i => !i.settled);
+
+  // Aggregate totals
+  let totalItems = active.length;
+  let totalVal = 0, shopEarned = 0, supplierOwed = 0;
+  const bySupplier = {};
+
+  active.forEach(item => {
+    totalVal += item.qty_remaining * item.price;
+    item.sales_log.forEach(entry => {
+      const gross      = entry.total || 0;
+      const sShare     = gross * (item.supplier_pct / 100);
+      const shShare    = gross * (item.shop_pct / 100);
+      shopEarned      += shShare;
+      supplierOwed    += sShare;
+    });
+    if (!bySupplier[item.supplier]) bySupplier[item.supplier] = [];
+    bySupplier[item.supplier].push(item);
+  });
+
+  document.getElementById('cs-total-items').textContent  = totalItems;
+  document.getElementById('cs-total-val').textContent    = fmtNum(totalVal) + ' ETB';
+  document.getElementById('cs-shop-earned').textContent  = fmtNum(shopEarned) + ' ETB';
+  document.getElementById('cs-supplier-owed').textContent = fmtNum(supplierOwed) + ' ETB';
+
+  const list = document.getElementById('consignment-list');
+  list.innerHTML = Object.entries(bySupplier).map(([supplier, items]) => {
+    const itemsHtml = items.map(item => {
+      const sold   = item.qty_original - item.qty_remaining;
+      const earned = item.sales_log.reduce((a, e) => a + (e.total || 0) * (item.supplier_pct / 100), 0);
+      const pct    = item.qty_original > 0 ? Math.round((sold / item.qty_original) * 100) : 0;
+      return `
+        <div class="consign-item">
+          <div style="flex:1;min-width:0">
+            <div class="consign-item-name">${item.product.substring(0, 40)}</div>
+            <div class="consign-item-sub">
+              📦 ${item.qty_remaining}/${item.qty_original} remaining · ${pct}% sold
+              <span style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:3px;margin-left:4px">${item.id}</span>
+            </div>
+            <div style="margin-top:4px;height:3px;background:rgba(255,255,255,.1);border-radius:2px">
+              <div style="width:${pct}%;height:100%;background:var(--green);border-radius:2px;transition:width .5s"></div>
+            </div>
+          </div>
+          <div class="consign-split">
+            <div class="consign-split-pct">${item.shop_pct}% / ${item.supplier_pct}%</div>
+            <div class="consign-split-amt">${fmtNum(item.price * item.shop_pct / 100)} / ${fmtNum(item.price * item.supplier_pct / 100)} per unit</div>
+            <div style="font-size:11px;color:var(--amber);margin-top:2px">Earned: ${fmtNum(earned)} ETB</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="consign-card">
+        <div class="consign-supplier">🤝 ${supplier}</div>
+        ${itemsHtml}
+      </div>
+    `;
+  }).join('');
+}
+
+function generateSettlementReport() {
+  const data      = consignmentData;
+  const active    = Object.values(data).filter(i => !i.settled);
+  const byS       = {};
+  active.forEach(item => {
+    if (!byS[item.supplier]) byS[item.supplier] = { items: [], sOwed: 0, shKeep: 0 };
+    item.sales_log.forEach(e => {
+      byS[item.supplier].sOwed  += (e.total || 0) * (item.supplier_pct / 100);
+      byS[item.supplier].shKeep += (e.total || 0) * (item.shop_pct / 100);
+    });
+    byS[item.supplier].items.push(item);
+  });
+
+  const now  = new Date();
+  const month = now.toLocaleString('en', { month: 'long', year: 'numeric' });
+  let   report = `📋 SETTLEMENT REPORT — ${month}\n2M Smart Spare · Addis Ababa\n${'─'.repeat(40)}\n\n`;
+  let   grandS = 0, grandSh = 0;
+
+  Object.entries(byS).forEach(([supplier, info]) => {
+    report  += `🤝 ${supplier}\n`;
+    info.items.forEach(item => {
+      const sold = item.qty_original - item.qty_remaining;
+      report  += `  • ${item.product.substring(0,36)}: ${sold} sold\n`;
+    });
+    report  += `  Shop keeps : ${fmtNum(info.shKeep)} ETB\n`;
+    report  += `  ➤ OWED    : ${fmtNum(info.sOwed)} ETB\n\n`;
+    grandS  += info.sOwed;
+    grandSh += info.shKeep;
+  });
+  report += `${'─'.repeat(40)}\nTOTAL OWED TO SUPPLIERS: ${fmtNum(grandS)} ETB\nSHOP COMMISSION TOTAL  : ${fmtNum(grandSh)} ETB`;
+
+  // Copy to clipboard
+  navigator.clipboard?.writeText(report).then(() => {
+    showToast('📋 Settlement report copied to clipboard!', 'green');
+  }).catch(() => {
+    alert(report);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHAPA PAYMENT & QR CODE
+// ═══════════════════════════════════════════════════════════════
+
+const SUBSCRIPTION_TIERS = [
+  { key: 'basic',    label: 'Basic ⭐',    price: 500,  desc: 'Bot access + daily reports' },
+  { key: 'standard', label: 'Standard ⭐⭐', price: 750,  desc: 'Basic + AI Coach + trends' },
+  { key: 'premium',  label: 'Premium ⭐⭐⭐', price: 1000, desc: 'All features + consignment' },
+];
+
+let selectedTier  = null;
+let qrInstance    = null;
+let chapaLinkUrl  = '';
+
+function renderPaymentTab() {
+  // Build subscription tiers
+  const tiersEl = document.getElementById('sub-tiers');
+  tiersEl.innerHTML = SUBSCRIPTION_TIERS.map(t => `
+    <div class="sub-tier-card" id="tier-${t.key}" onclick="selectTier('${t.key}')">
+      <div>
+        <div class="sub-tier-name">${t.label}</div>
+        <div class="sub-tier-desc">${t.desc}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="sub-tier-price">${t.price.toLocaleString()}</div>
+        <div class="sub-tier-mo">ETB/month</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectTier(key) {
+  selectedTier = SUBSCRIPTION_TIERS.find(t => t.key === key);
+  document.querySelectorAll('.sub-tier-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('tier-' + key).classList.add('selected');
+  document.getElementById('btn-subscribe').disabled = false;
+
+  // Pre-fill amount
+  document.getElementById('chapa-amount').value = selectedTier.price;
+  document.getElementById('chapa-desc').value   = `2M Smart Spare ${selectedTier.label} Plan`;
+  updateQR();
+
+  document.getElementById('sub-status').textContent =
+    `✅ ${selectedTier.label} selected — ${selectedTier.price.toLocaleString()} ETB/month`;
+}
+
+let qrUpdateTimer = null;
+
+function updateQR() {
+  clearTimeout(qrUpdateTimer);
+  qrUpdateTimer = setTimeout(_doUpdateQR, 400);
+}
+
+function _doUpdateQR() {
+  const amount = parseFloat(document.getElementById('chapa-amount').value) || 0;
+  const desc   = document.getElementById('chapa-desc').value.trim();
+
+  if (amount <= 0) {
+    document.getElementById('qr-section').style.display = 'none';
+    return;
+  }
+
+  // Build a Chapa-style payment URL (demo mode uses a placeholder)
+  // In production this URL comes from /api/chapa_init endpoint on your Flask server
+  const txRef = 'TX-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+  chapaLinkUrl = `https://checkout.chapa.co/checkout/payment/${txRef}`;
+
+  document.getElementById('qr-section').style.display = 'flex';
+  document.getElementById('qr-amount-label').textContent = amount.toLocaleString() + ' ETB';
+  document.getElementById('qr-desc-label').textContent   = desc || '2M Smart Spare';
+
+  // Generate QR code
+  const qrEl = document.getElementById('qr-code');
+  qrEl.innerHTML = '';
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(qrEl, {
+      text:        chapaLinkUrl,
+      width:       140,
+      height:      140,
+      colorDark:   '#005C3B',
+      colorLight:  '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+  } else {
+    qrEl.innerHTML = '<div style="color:#005C3B;font-size:40px;margin:10px">📱</div>';
+  }
+}
+
+function openChapaLink() {
+  const amount = parseFloat(document.getElementById('chapa-amount').value) || 0;
+  if (!amount) {
+    showToast('⚠️ Enter an amount first', 'amber');
+    return;
+  }
+  // In production, call /api/chapa_init to get a real checkout URL from your Flask server
+  if (chapaLinkUrl) {
+    window.open(chapaLinkUrl, '_blank');
+    showToast('💳 Opening Chapa checkout…', 'green');
+  } else {
+    showToast('⚠️ Configure CHAPA_SECRET_KEY in .env to enable live payments', 'amber');
+  }
+}
+
+function subscribePlan() {
+  if (!selectedTier) return;
+  document.getElementById('chapa-amount').value = selectedTier.price;
+  document.getElementById('chapa-desc').value   =
+    `2M Smart Spare ${selectedTier.label} Monthly Subscription`;
+  updateQR();
+  setTimeout(() => {
+    openChapaLink();
+  }, 500);
+  showToast(`📦 Subscribing to ${selectedTier.label} plan…`, 'green');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENHANCED AI COACH (with consultant framing)
+// ═══════════════════════════════════════════════════════════════
+
+// Override the system prompt to include consultant role + consignment data
+const _origSendCoach = typeof sendCoach !== 'undefined' ? sendCoach : null;
+
+async function sendCoach() {
+  const input = document.getElementById('coach-input');
+  const q     = input.value.trim();
+  if (!q) return;
+  input.value = '';
+
+  addMsg(q, 'user');
+  const thinking = addMsg('⏳ Consulting the AI…', 'thinking');
+
+  const prods   = getProducts();
+  const monthly = getSalesForPeriod('monthly');
+  const weekly  = getSalesForPeriod('weekly');
+  const lowItems = Object.values(prods).filter(p => p.qty <= LOW_STOCK_AT).map(p => p.name);
+
+  // Weekly vs previous week for analyst context
+  const prevWeek = getSalesForPeriod('prev_week'); // handled below
+  const weekRev  = weekly.reduce((a, s) => a + (s.total || 0), 0);
+  const monRev   = monthly.reduce((a, s) => a + (s.total || 0), 0);
+
+  const topSellers = {};
+  monthly.forEach(s => {
+    topSellers[s.product_name || '?'] = (topSellers[s.product_name || '?'] || 0) + (s.total || 0);
+  });
+  const topList = Object.entries(topSellers).sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .map(([k, v]) => `${k}: ${fmtNum(v)} ETB`).join('\n');
+
+  // Consignment summary
+  const csActive = Object.values(consignmentData).filter(i => !i.settled);
+  const csLines  = csActive.map(i => {
+    const sold = i.qty_original - i.qty_remaining;
+    return `  ${i.product.substring(0,30)}: ${sold} sold, supplier ${i.supplier_pct}% share`;
+  }).join('\n');
+
+  const sysPrompt = `You are a senior business consultant and AI coach for "2M Smart Spare", an auto parts shop in Addis Ababa, Ethiopia.
+The shop sells EV and conventional vehicle spare parts. Ethiopia's EV market is growing fast (BYD, SAIC MG, Changan).
+Currency: Ethiopian Birr (ETB). Be concise, practical, and use bullet points when listing recommendations.
+
+SALES THIS WEEK: ${weekly.length} transactions, ${fmtNum(weekRev)} ETB
+SALES THIS MONTH: ${monthly.length} transactions, ${fmtNum(monRev)} ETB
+INVENTORY: ${Object.values(prods).length} SKUs
+LOW STOCK (≤3 units): ${lowItems.join(', ') || 'None'}
+MONTHLY TOP SELLERS:
+${topList || 'No sales data yet'}
+CONSIGNMENT ITEMS ON HAND:
+${csLines || 'None logged'}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:      'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system:     sysPrompt,
+        messages:   [{ role: 'user', content: q }],
+      })
+    });
+    const data = await resp.json();
+    thinking.remove();
+    if (data.content && data.content[0]) {
+      addMsg(data.content[0].text, 'bot');
+    } else if (data.error) {
+      addMsg(`⚠️ API error: ${data.error.message}\n\nSet CLAUDE_API_KEY in the bot's .env file.`, 'bot');
+    }
+  } catch (e) {
+    thinking.remove();
+    addMsg('⚠️ Could not reach the AI Coach. Make sure your API key is configured and the bot server is running.', 'bot');
+  }
+}
+</script>
+</body>
+</html>
