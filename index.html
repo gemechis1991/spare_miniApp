@@ -832,6 +832,37 @@
   }
   .sub-tier-mo { font-size: 10px; color: var(--dim); }
 
+  /* ── LANGUAGE SWITCHER ── */
+  .lang-switcher {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .lang-btn {
+    padding: 3px 7px;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: var(--navy3);
+    color: var(--dim);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .lang-btn.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+  }
+  .lang-btn:hover:not(.active) {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
   /* ── AI CONSULTANT ── */
   .quick-q.consultant {
     background: linear-gradient(135deg, rgba(232,80,10,.15), rgba(245,166,35,.1));
@@ -860,23 +891,31 @@
     <div class="brand-logo">⚙️</div>
     <div class="brand-text">
       <h1>2M Smart Spare</h1>
-      <p>Addis Ababa · Auto Parts</p>
+      <p data-i18n="header_sub">Addis Ababa · Auto Parts</p>
     </div>
   </div>
-  <div class="header-time">
-    <div id="live-clock">00:00:00</div>
-    <div id="live-date">—</div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('am')">አማ</button>
+      <button class="lang-btn" onclick="setLang('om')">Oro</button>
+      <button class="lang-btn" onclick="setLang('ti')">ትግ</button>
+    </div>
+    <div class="header-time">
+      <div id="live-clock">00:00:00</div>
+      <div id="live-date">—</div>
+    </div>
   </div>
 </header>
 
 <!-- TABS -->
 <nav class="tabs">
-  <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
-  <button class="tab-btn" onclick="showTab('inventory')">📦 Inventory</button>
-  <button class="tab-btn" onclick="showTab('sale')">🧾 Log Sale</button>
-  <button class="tab-btn" onclick="showTab('coach')">🤖 AI Coach</button>
-  <button class="tab-btn" onclick="showTab('consignment')">🤝 Consignment</button>
-  <button class="tab-btn" onclick="showTab('payment')">💳 Payment</button>
+  <button class="tab-btn active" onclick="showTab('dashboard')" data-i18n-tab="tab_dashboard">📊 Dashboard</button>
+  <button class="tab-btn" onclick="showTab('inventory')" data-i18n-tab="tab_inventory">📦 Inventory</button>
+  <button class="tab-btn" onclick="showTab('sale')" data-i18n-tab="tab_sale">🧾 Log Sale</button>
+  <button class="tab-btn" onclick="showTab('coach')" data-i18n-tab="tab_coach">🤖 AI Coach</button>
+  <button class="tab-btn" onclick="showTab('consignment')" data-i18n-tab="tab_consignment">🤝 Consignment</button>
+  <button class="tab-btn" onclick="showTab('payment')" data-i18n-tab="tab_payment">💳 Payment</button>
 </nav>
 
 <main>
@@ -884,16 +923,16 @@
   <!-- ══ DASHBOARD ══ -->
   <div id="tab-dashboard" class="section active">
     <div class="period-bar">
-      <button class="period-btn active" onclick="setPeriod('daily',this)">Today</button>
-      <button class="period-btn" onclick="setPeriod('weekly',this)">Week</button>
-      <button class="period-btn" onclick="setPeriod('monthly',this)">Month</button>
+      <button class="period-btn active" onclick="setPeriod('daily',this)" data-i18n="period_today">Today</button>
+      <button class="period-btn" onclick="setPeriod('weekly',this)" data-i18n="period_week">Week</button>
+      <button class="period-btn" onclick="setPeriod('monthly',this)" data-i18n="period_month">Month</button>
     </div>
 
     <!-- Best Sale of the Week -->
     <div class="best-sale-banner" id="best-sale-banner" style="display:none">
       <div class="best-sale-trophy">🏆</div>
       <div class="best-sale-info">
-        <div class="best-sale-label">Best Sale · This Week</div>
+      <div class="best-sale-label" data-i18n="best_sale_label">Best Sale · This Week</div>
         <div class="best-sale-name" id="best-sale-name">—</div>
         <div class="best-sale-meta" id="best-sale-meta">—</div>
       </div>
@@ -903,46 +942,46 @@
     <div class="kpi-grid" id="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-icon">💰</div>
-        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-label" data-i18n="kpi_revenue">Total Revenue</div>
         <div class="kpi-value" id="kpi-rev">—</div>
         <div class="kpi-sub">ETB</div>
       </div>
       <div class="kpi-card green">
         <div class="kpi-icon">🧾</div>
-        <div class="kpi-label">Transactions</div>
+        <div class="kpi-label" data-i18n="kpi_transactions">Transactions</div>
         <div class="kpi-value" id="kpi-txn">—</div>
-        <div class="kpi-sub">sales logged</div>
+        <div class="kpi-sub" data-i18n="kpi_sales_logged">sales logged</div>
       </div>
       <div class="kpi-card blue">
         <div class="kpi-icon">📦</div>
-        <div class="kpi-label">Units Sold</div>
+        <div class="kpi-label" data-i18n="kpi_units">Units Sold</div>
         <div class="kpi-value" id="kpi-units">—</div>
-        <div class="kpi-sub">parts out the door</div>
+        <div class="kpi-sub" data-i18n="kpi_parts_out">parts out the door</div>
       </div>
       <div class="kpi-card amber">
         <div class="kpi-icon">⚠️</div>
-        <div class="kpi-label">Low Stock</div>
+        <div class="kpi-label" data-i18n="kpi_low_stock">Low Stock</div>
         <div class="kpi-value" id="kpi-low">—</div>
-        <div class="kpi-sub">items need reorder</div>
+        <div class="kpi-sub" data-i18n="kpi_need_reorder">items need reorder</div>
       </div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-title">Revenue by Payment Method</div>
+      <div class="chart-title" data-i18n="chart_payment_method">Revenue by Payment Method</div>
       <div class="chart-wrap">
         <canvas id="chart-payment"></canvas>
       </div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-title">Top 5 Products</div>
+      <div class="chart-title" data-i18n="chart_top5">Top 5 Products</div>
       <div class="chart-wrap">
         <canvas id="chart-products"></canvas>
       </div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-title">Daily Revenue Trend</div>
+      <div class="chart-title" data-i18n="chart_trend">Daily Revenue Trend</div>
       <div class="chart-wrap">
         <canvas id="chart-trend"></canvas>
       </div>
@@ -951,13 +990,13 @@
 
   <!-- ══ INVENTORY ══ -->
   <div id="tab-inventory" class="section">
-    <div class="sec-title">📦 Inventory</div>
-    <input class="inv-search" id="inv-search" placeholder="🔍 Search by name, SKU, category…" oninput="filterInventory()"/>
+    <div class="sec-title" data-i18n="inv_title">📦 Inventory</div>
+    <input class="inv-search" id="inv-search" data-i18n-placeholder="inv_search_placeholder" placeholder="🔍 Search by name, SKU, category…" oninput="filterInventory()"/>
 
     <div class="type-filter">
-      <div class="type-btn active-all" onclick="setTypeFilter('all',this)">⚙️ All</div>
-      <div class="type-btn" onclick="setTypeFilter('electric',this)">⚡ EV</div>
-      <div class="type-btn" onclick="setTypeFilter('conventional',this)">🔧 ICE</div>
+      <div class="type-btn active-all" onclick="setTypeFilter('all',this)" data-i18n="filter_all">⚙️ All</div>
+      <div class="type-btn" onclick="setTypeFilter('electric',this)" data-i18n="filter_ev">⚡ EV</div>
+      <div class="type-btn" onclick="setTypeFilter('conventional',this)" data-i18n="filter_ice">🔧 ICE</div>
     </div>
 
     <div class="product-list" id="product-list"></div>
@@ -967,35 +1006,35 @@
   <div id="tab-sale" class="section">
     <div id="sale-form-wrap">
       <div class="sale-form">
-        <h2>🧾 Log a Sale</h2>
+        <h2 data-i18n="sale_title">🧾 Log a Sale</h2>
 
         <div class="form-group">
-          <label class="form-label">Product</label>
+          <label class="form-label" data-i18n="sale_product">Product</label>
           <select class="form-select" id="sale-product" onchange="onProductSelect()">
-            <option value="">— Select product —</option>
+            <option value="" data-i18n="sale_select_product">— Select product —</option>
           </select>
         </div>
 
         <div class="form-group" id="variant-group" style="display:none">
-          <label class="form-label">Variant</label>
+          <label class="form-label" data-i18n="sale_variant">Variant</label>
           <select class="form-select" id="sale-variant"></select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Unit Price (ETB)</label>
+          <label class="form-label" data-i18n="sale_unit_price">Unit Price (ETB)</label>
           <input class="form-input" type="number" id="sale-price" placeholder="e.g. 1500" min="1" oninput="calcTotal()"/>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Quantity</label>
+          <label class="form-label" data-i18n="sale_quantity">Quantity</label>
           <input class="form-input" type="number" id="sale-qty" value="1" min="1" oninput="calcTotal()"/>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Payment Method</label>
+          <label class="form-label" data-i18n="sale_payment_method">Payment Method</label>
           <div class="payment-grid">
             <div class="payment-opt" onclick="selectPay(this,'Cash')">
-              <span class="payment-icon">💵</span>Cash
+              <span class="payment-icon">💵</span><span data-i18n="pay_cash">Cash</span>
             </div>
             <div class="payment-opt" onclick="selectPay(this,'Telebirr')">
               <span class="payment-icon">📱</span>Telebirr
@@ -1004,20 +1043,20 @@
               <span class="payment-icon">🏦</span>CBE Birr
             </div>
             <div class="payment-opt" onclick="selectPay(this,'Bank Transfer')">
-              <span class="payment-icon">🏧</span>Bank Transfer
+              <span class="payment-icon">🏧</span><span data-i18n="pay_bank">Bank Transfer</span>
             </div>
           </div>
         </div>
 
         <div class="sale-total">
           <div>
-            <div class="sale-total-label">Total Amount</div>
+            <div class="sale-total-label" data-i18n="sale_total_amount">Total Amount</div>
             <div class="kpi-sub" id="sale-calc-note">0 units × 0 ETB</div>
           </div>
           <div class="sale-total-amt" id="sale-total-display">0 ETB</div>
         </div>
 
-        <button class="btn-confirm" id="btn-confirm-sale" onclick="confirmSale()" disabled>
+        <button class="btn-confirm" id="btn-confirm-sale" onclick="confirmSale()" disabled data-i18n="sale_record_btn">
           RECORD SALE ▶
         </button>
       </div>
@@ -1025,9 +1064,9 @@
 
     <div id="sale-success" class="success-screen">
       <div class="success-checkmark">✅</div>
-      <h2>Sale Recorded!</h2>
+      <h2 data-i18n="sale_recorded">Sale Recorded!</h2>
       <div class="success-detail" id="success-detail"></div>
-      <button class="btn-new-sale" onclick="resetSale()">＋ NEW SALE</button>
+      <button class="btn-new-sale" onclick="resetSale()" data-i18n="sale_new">＋ NEW SALE</button>
     </div>
   </div>
 
@@ -1037,59 +1076,59 @@
       <div class="coach-header">
         <div class="coach-avatar">🤖</div>
         <div>
-          <div class="coach-title">AI Business Coach</div>
-          <div class="coach-sub">Powered by Claude · Business Consultant</div>
+          <div class="coach-title" data-i18n="coach_title">AI Business Coach</div>
+          <div class="coach-sub" data-i18n="coach_sub">Powered by Claude · Business Consultant</div>
         </div>
       </div>
 
       <div class="quick-qs">
-        <span class="consultant-badge">AI Consultant</span>
-        <div class="quick-q consultant" onclick="askQuick('Why are my sales lower this week? Diagnose causes from my data and give 5 specific actions to recover immediately.')">📉 Why are sales lower this week?</div>
-        <div class="quick-q" onclick="askQuick('Which products should I restock urgently?')">Restock advice</div>
-        <div class="quick-q" onclick="askQuick('How can I grow EV parts sales in Addis Ababa?')">Grow EV sales</div>
-        <div class="quick-q" onclick="askQuick('What promotions should I run this week?')">Promotions</div>
-        <div class="quick-q" onclick="askQuick('Which payment method is most popular?')">Payment trends</div>
-        <div class="quick-q" onclick="askQuick('Give me pricing advice for my top products.')">Pricing tips</div>
-        <div class="quick-q consultant" onclick="askQuick('Design a promotion strategy for this week based on slow-moving stock and my customer payment preferences.')">💡 Promotions strategy</div>
-        <div class="quick-q consultant" onclick="askQuick('Analyze my consignment items. Which supplier is generating most value? Should I renegotiate any percentage splits?')">🤝 Consignment analysis</div>
+        <span class="consultant-badge" data-i18n="coach_badge">AI Consultant</span>
+        <div class="quick-q consultant" onclick="askQuick('Why are my sales lower this week? Diagnose causes from my data and give 5 specific actions to recover immediately.')" data-i18n="qq_sales_lower">📉 Why are sales lower this week?</div>
+        <div class="quick-q" onclick="askQuick('Which products should I restock urgently?')" data-i18n="qq_restock">Restock advice</div>
+        <div class="quick-q" onclick="askQuick('How can I grow EV parts sales in Addis Ababa?')" data-i18n="qq_ev_sales">Grow EV sales</div>
+        <div class="quick-q" onclick="askQuick('What promotions should I run this week?')" data-i18n="qq_promotions">Promotions</div>
+        <div class="quick-q" onclick="askQuick('Which payment method is most popular?')" data-i18n="qq_payment_trends">Payment trends</div>
+        <div class="quick-q" onclick="askQuick('Give me pricing advice for my top products.')" data-i18n="qq_pricing">Pricing tips</div>
+        <div class="quick-q consultant" onclick="askQuick('Design a promotion strategy for this week based on slow-moving stock and my customer payment preferences.')" data-i18n="qq_promo_strategy">💡 Promotions strategy</div>
+        <div class="quick-q consultant" onclick="askQuick('Analyze my consignment items. Which supplier is generating most value? Should I renegotiate any percentage splits?')" data-i18n="qq_consign_analysis">🤝 Consignment analysis</div>
       </div>
 
       <div class="coach-messages" id="coach-messages">
-        <div class="msg bot">
+        <div class="msg bot" data-i18n="coach_greeting">
           👋 Hello! I'm your 2M Smart Spare business coach. I know your inventory, sales trends, and the Ethiopian auto parts market — including the booming EV segment.<br><br>Ask me anything!
         </div>
       </div>
 
       <div class="coach-input-row">
-        <input class="coach-input" id="coach-input" placeholder="Ask your coach…" onkeydown="if(event.key==='Enter')sendCoach()"/>
-        <button class="coach-send" onclick="sendCoach()">SEND</button>
+        <input class="coach-input" id="coach-input" data-i18n-placeholder="coach_input_placeholder" placeholder="Ask your coach…" onkeydown="if(event.key==='Enter')sendCoach()"/>
+        <button class="coach-send" onclick="sendCoach()" data-i18n="coach_send">SEND</button>
       </div>
     </div>
   </div>
 
   <!-- ══ CONSIGNMENT ══ -->
   <div id="tab-consignment" class="section">
-    <div class="sec-title">🤝 Consignment Stock</div>
+    <div class="sec-title" data-i18n="cs_title">🤝 Consignment Stock</div>
     <div class="settle-summary">
       <div class="settle-row">
-        <span>Total consignment items</span>
+        <span data-i18n="cs_total_items">Total consignment items</span>
         <span id="cs-total-items">—</span>
       </div>
       <div class="settle-row">
-        <span>Gross consignment value</span>
+        <span data-i18n="cs_gross_value">Gross consignment value</span>
         <span id="cs-total-val">—</span>
       </div>
       <div class="settle-row">
-        <span>Shop commission earned</span>
+        <span data-i18n="cs_commission">Shop commission earned</span>
         <span id="cs-shop-earned">—</span>
       </div>
       <div class="settle-row">
-        <span>Owed to suppliers</span>
+        <span data-i18n="cs_owed">Owed to suppliers</span>
         <span id="cs-supplier-owed">—</span>
       </div>
     </div>
     <div id="consignment-list"></div>
-    <button class="settle-btn" onclick="generateSettlementReport()">
+    <button class="settle-btn" onclick="generateSettlementReport()" data-i18n="cs_generate_report">
       📋 Generate Settlement Report
     </button>
   </div>
@@ -1097,16 +1136,16 @@
   <!-- ══ PAYMENT & SUBSCRIPTION ══ -->
   <div id="tab-payment" class="section">
     <div class="payment-section">
-      <div class="payment-section-title">💳 Chapa Payment Link</div>
+      <div class="payment-section-title" data-i18n="pay_chapa_link">💳 Chapa Payment Link</div>
       <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input class="form-input" id="chapa-amount" type="number" placeholder="Amount (ETB)" min="1" style="flex:1" oninput="updateQR()"/>
-        <input class="form-input" id="chapa-desc" placeholder="Description" style="flex:2" oninput="updateQR()"/>
+        <input class="form-input" id="chapa-amount" type="number" data-i18n-placeholder="pay_amount_placeholder" placeholder="Amount (ETB)" min="1" style="flex:1" oninput="updateQR()"/>
+        <input class="form-input" id="chapa-desc" data-i18n-placeholder="pay_desc_placeholder" placeholder="Description" style="flex:2" oninput="updateQR()"/>
       </div>
       <button class="chapa-btn" onclick="openChapaLink()">
-        <span class="chapa-logo">🇪🇹</span> PAY WITH CHAPA
+        <span class="chapa-logo">🇪🇹</span> <span data-i18n="pay_with_chapa">PAY WITH CHAPA</span>
       </button>
       <div class="qr-wrap" id="qr-section" style="display:none">
-        <div class="qr-label">Scan to Pay</div>
+        <div class="qr-label" data-i18n="pay_scan">Scan to Pay</div>
         <div id="qr-code"></div>
         <div class="qr-amount" id="qr-amount-label">0 ETB</div>
         <div style="font-size:10px;color:#666;text-align:center" id="qr-desc-label"></div>
@@ -1114,9 +1153,9 @@
     </div>
 
     <div class="payment-section">
-      <div class="payment-section-title">📦 Platform Subscription</div>
+      <div class="payment-section-title" data-i18n="pay_subscription">📦 Platform Subscription</div>
       <div class="sub-tiers" id="sub-tiers"></div>
-      <button class="btn-confirm" id="btn-subscribe" onclick="subscribePlan()" disabled>
+      <button class="btn-confirm" id="btn-subscribe" onclick="subscribePlan()" disabled data-i18n="pay_subscribe_btn">
         SUBSCRIBE & PAY ▶
       </button>
       <div id="sub-status" style="margin-top:10px;font-size:12px;color:var(--dim);text-align:center"></div>
@@ -1502,7 +1541,7 @@ function confirmSale() {
     `<strong>Total: ${fmtNum(total)} ETB</strong> via ${selectedPayment}<br><br>` +
     `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">ID: ${sid}</span>`;
 
-  showToast('✅ Sale recorded!', 'green');
+  showToast(t('toast_sale_ok'), 'green');
 }
 
 function resetSale() {
@@ -1790,11 +1829,417 @@ function generateSettlementReport() {
 
   // Copy to clipboard
   navigator.clipboard?.writeText(report).then(() => {
-    showToast('📋 Settlement report copied to clipboard!', 'green');
+    showToast(t('toast_settle_copied'), 'green');
   }).catch(() => {
     alert(report);
   });
 }
+
+// ═══════════════════════════════════════════════════════════════
+// MULTILINGUAL / i18n SYSTEM
+// Languages: en (English), am (Amharic), om (Afan Oromo), ti (Tigrigna)
+// ═══════════════════════════════════════════════════════════════
+
+let currentLang = 'en';
+
+const TRANSLATIONS = {
+  en: {
+    // Header
+    header_sub: 'Addis Ababa · Auto Parts',
+    // Tabs
+    tab_dashboard: '📊 Dashboard',
+    tab_inventory: '📦 Inventory',
+    tab_sale: '🧾 Log Sale',
+    tab_coach: '🤖 AI Coach',
+    tab_consignment: '🤝 Consignment',
+    tab_payment: '💳 Payment',
+    // Period
+    period_today: 'Today',
+    period_week: 'Week',
+    period_month: 'Month',
+    // KPI
+    kpi_revenue: 'Total Revenue',
+    kpi_transactions: 'Transactions',
+    kpi_sales_logged: 'sales logged',
+    kpi_units: 'Units Sold',
+    kpi_parts_out: 'parts out the door',
+    kpi_low_stock: 'Low Stock',
+    kpi_need_reorder: 'items need reorder',
+    // Charts
+    chart_payment_method: 'Revenue by Payment Method',
+    chart_top5: 'Top 5 Products',
+    chart_trend: 'Daily Revenue Trend',
+    // Best sale
+    best_sale_label: 'Best Sale · This Week',
+    // Inventory
+    inv_title: '📦 Inventory',
+    inv_search_placeholder: '🔍 Search by name, SKU, category…',
+    filter_all: '⚙️ All',
+    filter_ev: '⚡ EV',
+    filter_ice: '🔧 ICE',
+    // Sale form
+    sale_title: '🧾 Log a Sale',
+    sale_product: 'Product',
+    sale_select_product: '— Select product —',
+    sale_variant: 'Variant',
+    sale_unit_price: 'Unit Price (ETB)',
+    sale_quantity: 'Quantity',
+    sale_payment_method: 'Payment Method',
+    pay_cash: 'Cash',
+    pay_bank: 'Bank Transfer',
+    sale_total_amount: 'Total Amount',
+    sale_record_btn: 'RECORD SALE ▶',
+    sale_recorded: 'Sale Recorded!',
+    sale_new: '＋ NEW SALE',
+    // Coach
+    coach_title: 'AI Business Coach',
+    coach_sub: 'Powered by Claude · Business Consultant',
+    coach_badge: 'AI Consultant',
+    qq_sales_lower: '📉 Why are sales lower this week?',
+    qq_restock: 'Restock advice',
+    qq_ev_sales: 'Grow EV sales',
+    qq_promotions: 'Promotions',
+    qq_payment_trends: 'Payment trends',
+    qq_pricing: 'Pricing tips',
+    qq_promo_strategy: '💡 Promotions strategy',
+    qq_consign_analysis: '🤝 Consignment analysis',
+    coach_greeting: '👋 Hello! I\'m your 2M Smart Spare business coach. I know your inventory, sales trends, and the Ethiopian auto parts market — including the booming EV segment.<br><br>Ask me anything!',
+    coach_input_placeholder: 'Ask your coach…',
+    coach_send: 'SEND',
+    // Consignment
+    cs_title: '🤝 Consignment Stock',
+    cs_total_items: 'Total consignment items',
+    cs_gross_value: 'Gross consignment value',
+    cs_commission: 'Shop commission earned',
+    cs_owed: 'Owed to suppliers',
+    cs_generate_report: '📋 Generate Settlement Report',
+    // Payment
+    pay_chapa_link: '💳 Chapa Payment Link',
+    pay_amount_placeholder: 'Amount (ETB)',
+    pay_desc_placeholder: 'Description',
+    pay_with_chapa: 'PAY WITH CHAPA',
+    pay_scan: 'Scan to Pay',
+    pay_subscription: '📦 Platform Subscription',
+    pay_subscribe_btn: 'SUBSCRIBE & PAY ▶',
+    // Toast
+    toast_sale_ok: '✅ Sale recorded!',
+    toast_settle_copied: '📋 Settlement report copied to clipboard!',
+    toast_enter_amount: '⚠️ Enter an amount first',
+    toast_chapa_open: '💳 Opening Chapa checkout…',
+    toast_chapa_config: '⚠️ Configure CHAPA_SECRET_KEY in .env to enable live payments',
+    // Subscription tiers
+    tier_basic_desc: 'Bot access + daily reports',
+    tier_standard_desc: 'Basic + AI Coach + trends',
+    tier_premium_desc: 'All features + consignment',
+    tier_mo: 'ETB/month',
+    // AI thinking
+    ai_thinking: '⏳ Consulting the AI…',
+    ai_error_api: '⚠️ API error: ',
+    ai_error_key: '\n\nSet CLAUDE_API_KEY in the bot\'s .env file.',
+    ai_error_reach: '⚠️ Could not reach the AI Coach. Make sure your API key is configured and the bot server is running.',
+  },
+
+  am: {
+    // Amharic (አማርኛ)
+    header_sub: 'አዲስ አበባ · የመኪና መለዋወጫ',
+    tab_dashboard: '📊 ዳሽቦርድ',
+    tab_inventory: '📦 ዝርዝር ሸቀጦች',
+    tab_sale: '🧾 ሽያጭ መዝግብ',
+    tab_coach: '🤖 AI አማካሪ',
+    tab_consignment: '🤝 ኮንሲግሜንት',
+    tab_payment: '💳 ክፍያ',
+    period_today: 'ዛሬ',
+    period_week: 'ሳምንት',
+    period_month: 'ወር',
+    kpi_revenue: 'ጠቅላላ ገቢ',
+    kpi_transactions: 'ግብይቶች',
+    kpi_sales_logged: 'የተመዘገቡ ሽያጮች',
+    kpi_units: 'የተሸጡ ክፍሎች',
+    kpi_parts_out: 'የወጡ ሸቀጦች',
+    kpi_low_stock: 'አነስተኛ ክምችት',
+    kpi_need_reorder: 'ዕቃ ያስፈልጋቸዋል',
+    chart_payment_method: 'በክፍያ ዘዴ የተገኘ ገቢ',
+    chart_top5: 'ምርጥ 5 ምርቶች',
+    chart_trend: 'ዕለታዊ የገቢ አዝማሚያ',
+    best_sale_label: 'ምርጥ ሽያጭ · ይህ ሳምንት',
+    inv_title: '📦 ዝርዝር ሸቀጦች',
+    inv_search_placeholder: '🔍 በስም፣ SKU፣ ምድብ ይፈልጉ…',
+    filter_all: '⚙️ ሁሉም',
+    filter_ev: '⚡ EV',
+    filter_ice: '🔧 ICE',
+    sale_title: '🧾 ሽያጭ ይዝግቡ',
+    sale_product: 'ምርት',
+    sale_select_product: '— ምርት ይምረጡ —',
+    sale_variant: 'ዓይነት',
+    sale_unit_price: 'የአንድ ዋጋ (ETB)',
+    sale_quantity: 'ብዛት',
+    sale_payment_method: 'የክፍያ ዘዴ',
+    pay_cash: 'ጥሬ ገንዘብ',
+    pay_bank: 'የባንክ ዝውውር',
+    sale_total_amount: 'ጠቅላላ መጠን',
+    sale_record_btn: 'ሽያጭ ይዝግቡ ▶',
+    sale_recorded: 'ሽያጭ ተመዝግቧል!',
+    sale_new: '＋ አዲስ ሽያጭ',
+    coach_title: 'AI ቢዝነስ አማካሪ',
+    coach_sub: 'በ Claude የተደገፈ · የቢዝነስ አማካሪ',
+    coach_badge: 'AI አማካሪ',
+    qq_sales_lower: '📉 ሽያጮቼ ለምን ዝቅ አሉ?',
+    qq_restock: 'የምክር ዕቃ ሙያ',
+    qq_ev_sales: 'EV ሽያጭ ማሳደግ',
+    qq_promotions: 'ማስተዋወቂያዎች',
+    qq_payment_trends: 'የክፍያ አዝማሚያዎች',
+    qq_pricing: 'የዋጋ ምክር',
+    qq_promo_strategy: '💡 የማስተዋወቂያ ስልት',
+    qq_consign_analysis: '🤝 የኮንሲግሜንት ትንተና',
+    coach_greeting: '👋 ሰላም! እኔ የ2M Smart Spare ቢዝነስ አማካሪዎ ነኝ። የዕቃ ዝርዝርዎን፣ የሽያጭ አዝማሚያዎን፣ እና የኢትዮጵያ የመኪና መለዋወጫ ገበያን — EV ዘርፍን ጨምሮ — አውቃለሁ።<br><br>ማንኛውንም ጥያቄ ይጠይቁ!',
+    coach_input_placeholder: 'አማካሪዎን ይጠይቁ…',
+    coach_send: 'ላክ',
+    cs_title: '🤝 የኮንሲግሜንት ዕቃዎች',
+    cs_total_items: 'ጠቅላላ የኮንሲግሜንት ዕቃዎች',
+    cs_gross_value: 'ጠቅላላ የኮንሲግሜንት ዋጋ',
+    cs_commission: 'የሱቅ ኮሚሽን',
+    cs_owed: 'ለአቅራቢዎች የሚከፈል',
+    cs_generate_report: '📋 የወጪ ሪፖርት ይፍጠሩ',
+    pay_chapa_link: '💳 የቻፓ ክፍያ ሊንክ',
+    pay_amount_placeholder: 'መጠን (ETB)',
+    pay_desc_placeholder: 'መግለጫ',
+    pay_with_chapa: 'በቻፓ ይክፈሉ',
+    pay_scan: 'ለመክፈል ስካን ያድርጉ',
+    pay_subscription: '📦 የፕላትፎርም ደንበኝነት',
+    pay_subscribe_btn: 'ይመዝገቡ እና ይክፈሉ ▶',
+    toast_sale_ok: '✅ ሽያጭ ተመዝግቧል!',
+    toast_settle_copied: '📋 ሪፖርቱ ተቀድቷል!',
+    toast_enter_amount: '⚠️ መጠን ያስገቡ',
+    toast_chapa_open: '💳 ቻፓ ቼክኣውት እየተከፈተ…',
+    toast_chapa_config: '⚠️ CHAPA_SECRET_KEY ያስተካክሉ',
+    tier_basic_desc: 'የቦት መዳረሻ + ዕለታዊ ሪፖርቶች',
+    tier_standard_desc: 'መሰረታዊ + AI አማካሪ + አዝማሚያዎች',
+    tier_premium_desc: 'ሁሉም ባህሪያት + ኮንሲግሜንት',
+    tier_mo: 'ETB/ወር',
+    ai_thinking: '⏳ AI እያማከረ…',
+    ai_error_api: '⚠️ የ API ስህተት: ',
+    ai_error_key: '\n\nCLAUDE_API_KEY ያዋቅሩ።',
+    ai_error_reach: '⚠️ AI አማካሪው ሊደረስ አልቻለም። API ቁልፉ መዋቀሩን ያረጋግጡ።',
+  },
+
+  om: {
+    // Afan Oromo (Oromiffaa)
+    header_sub: 'Addis Ababa · Spare Parts Konkolaataa',
+    tab_dashboard: '📊 Dashboordii',
+    tab_inventory: '📦 Kuusaa Meeshaa',
+    tab_sale: '🧾 Gurgurtaa Galchi',
+    tab_coach: '🤖 AI Gorsaa',
+    tab_consignment: '🤝 Konsaayimantii',
+    tab_payment: '💳 Kaffaltii',
+    period_today: 'Har\'a',
+    period_week: 'Torban',
+    period_month: 'Ji\'a',
+    kpi_revenue: 'Galii Waliigalaa',
+    kpi_transactions: 'Daldalawwan',
+    kpi_sales_logged: 'gurgurtaa galmaaye',
+    kpi_units: 'Meeshaa Gurguraman',
+    kpi_parts_out: 'meeshaan bahe',
+    kpi_low_stock: 'Kuusaa Xiqqaa',
+    kpi_need_reorder: 'meeshaan barbaachisu',
+    chart_payment_method: 'Galii Karaa Kaffaltiitin',
+    chart_top5: 'Oomishaalee 5 Ol\'aanoo',
+    chart_trend: 'Tartiiba Galii Guyyaa Guyyaa',
+    best_sale_label: 'Gurgurtaa Caalutti · Torban Kana',
+    inv_title: '📦 Kuusaa Meeshaa',
+    inv_search_placeholder: '🔍 Maqaa, SKU, gosa…n barbaadi',
+    filter_all: '⚙️ Hunda',
+    filter_ev: '⚡ EV',
+    filter_ice: '🔧 ICE',
+    sale_title: '🧾 Gurgurtaa Galchi',
+    sale_product: 'Oomisha',
+    sale_select_product: '— Oomisha filadhu —',
+    sale_variant: 'Gosa',
+    sale_unit_price: 'Gatii Tokko (ETB)',
+    sale_quantity: 'Lakkoofsa',
+    sale_payment_method: 'Karaa Kaffaltii',
+    pay_cash: 'Maallaqaa',
+    pay_bank: 'Daddabarsa Baankii',
+    sale_total_amount: 'Galiiwwan Waliigalaa',
+    sale_record_btn: 'GURGURTAA GALCHI ▶',
+    sale_recorded: 'Gurgurtaan Galmaaye!',
+    sale_new: '＋ GURGURTAA HAARAA',
+    coach_title: 'AI Gorsaa Biizinasii',
+    coach_sub: 'Claude Irratti Hundaa\'e · Gorsaa Biizinasii',
+    coach_badge: 'AI Gorsaa',
+    qq_sales_lower: '📉 Maaliif gurgurtaan kiyya xiqqaate?',
+    qq_restock: 'Gorsa meeshaa guutuu',
+    qq_ev_sales: 'Gurgurtaa EV guddisi',
+    qq_promotions: 'Beeksisa',
+    qq_payment_trends: 'Tartiiba kaffaltii',
+    qq_pricing: 'Gorsa gatii',
+    qq_promo_strategy: '💡 Tarsiimoo beeksisaa',
+    qq_consign_analysis: '🤝 Xiinxala konsaayimantii',
+    coach_greeting: '👋 Akkam! An gorsaa biizinasii 2M Smart Spare keessani. Kuusaa meeshaa keessan, tartiiba gurgurtaa, fi gabaa spare parts Itoophiyaa — kutaa EV dabalatee — nan beeka.<br><br>Waan fedhan gaafadhaa!',
+    coach_input_placeholder: 'Gorsaa keessan gaafadhaa…',
+    coach_send: 'ERGI',
+    cs_title: '🤝 Meeshaalee Konsaayimantii',
+    cs_total_items: 'Meeshaalee konsaayimantii waliigalaa',
+    cs_gross_value: 'Gatii konsaayimantii waliigalaa',
+    cs_commission: 'Komishinii dukkaanaa argame',
+    cs_owed: 'Dhiyeessitootaf kaffalamu',
+    cs_generate_report: '📋 Gabaasa Qindeessa Tolchi',
+    pay_chapa_link: '💳 Hidhannoo Kaffaltii Chapa',
+    pay_amount_placeholder: 'Baasii (ETB)',
+    pay_desc_placeholder: 'Ibsa',
+    pay_with_chapa: 'CHAPA IRRAAN KAFALI',
+    pay_scan: 'Kaffachuuf Scan Godhi',
+    pay_subscription: '📦 Miseensummaa Platformii',
+    pay_subscribe_btn: 'MISEENSI KAFALI ▶',
+    toast_sale_ok: '✅ Gurgurtaan galmaaye!',
+    toast_settle_copied: '📋 Gabaasni harcaaye!',
+    toast_enter_amount: '⚠️ Baasii galchi',
+    toast_chapa_open: '💳 Chapa checkout banaa jira…',
+    toast_chapa_config: '⚠️ CHAPA_SECRET_KEY qindeessi',
+    tier_basic_desc: 'Dhaqqabummaa bot + gabaasaalee guyyaa guyyaa',
+    tier_standard_desc: 'Bu\'uuraa + AI Gorsaa + tartiibawwan',
+    tier_premium_desc: 'Amaloota hunda + konsaayimantii',
+    tier_mo: 'ETB/ji\'a',
+    ai_thinking: '⏳ AI mariisaa jira…',
+    ai_error_api: '⚠️ Dogoggora API: ',
+    ai_error_key: '\n\nCLAUDE_API_KEY qindeessi.',
+    ai_error_reach: '⚠️ AI Gorsaa hin dhaqqabamne. Furtuun API qindaa\'e akka ta\'e mirkaneeffadhu.',
+  },
+
+  ti: {
+    // Tigrigna (ትግርኛ)
+    header_sub: 'ኣዲስ ኣበባ · ተቀያያሪ ክፋል መኪና',
+    tab_dashboard: '📊 ዳሽቦርድ',
+    tab_inventory: '📦 ዝርዝር ሸቀጣሸቀጥ',
+    tab_sale: '🧾 ሽያጥ ምዝጋብ',
+    tab_coach: '🤖 AI መምህር',
+    tab_consignment: '🤝 ኮንሲኝምንት',
+    tab_payment: '💳 ክፍሊት',
+    period_today: 'ሎሚ',
+    period_week: 'ሰሙን',
+    period_month: 'ወርሒ',
+    kpi_revenue: 'ጠቕላላ እቶት',
+    kpi_transactions: 'ምትግባራት',
+    kpi_sales_logged: 'ዝተመዝገቡ ሽያጣት',
+    kpi_units: 'ዝተሸጡ ክፋላት',
+    kpi_parts_out: 'ዝወጹ ሸቀጣሸቀጥ',
+    kpi_low_stock: 'ውሑድ ዕቃ',
+    kpi_need_reorder: 'ዕቃ ዘድሊ',
+    chart_payment_method: 'እቶት ብዓይነት ክፍሊት',
+    chart_top5: 'ዝላዓሉ 5 ቀዳሞት ፍርያት',
+    chart_trend: 'ዕለታዊ ኣዝማምያ እቶት',
+    best_sale_label: 'ዝበለጸ ሽያጥ · እዚ ሰሙን',
+    inv_title: '📦 ዝርዝር ሸቀጣሸቀጥ',
+    inv_search_placeholder: '🔍 ብስም፣ SKU፣ ዓይነት ድለ…',
+    filter_all: '⚙️ ኩሉ',
+    filter_ev: '⚡ EV',
+    filter_ice: '🔧 ICE',
+    sale_title: '🧾 ሽያጥ ምዝጋብ',
+    sale_product: 'ፍርያት',
+    sale_select_product: '— ፍርያት ምረጽ —',
+    sale_variant: 'ዓይነት',
+    sale_unit_price: 'ዋጋ ሓደ (ETB)',
+    sale_quantity: 'ብዝሒ',
+    sale_payment_method: 'ዓይነት ክፍሊት',
+    pay_cash: 'ጥረ ገንዘብ',
+    pay_bank: 'ምስግጋር ባንኪ',
+    sale_total_amount: 'ጠቕላላ መጠን',
+    sale_record_btn: 'ሽያጥ ምዝጋብ ▶',
+    sale_recorded: 'ሽያጥ ተመዝጊቡ!',
+    sale_new: '＋ ሓድሽ ሽያጥ',
+    coach_title: 'AI መምህር ቢዝነስ',
+    coach_sub: 'ብ Claude ዝተሓገዘ · ኣማኻሪ ቢዝነስ',
+    coach_badge: 'AI ኣማኻሪ',
+    qq_sales_lower: '📉 ሽያጠይ ስለምንታይ ወረደ?',
+    qq_restock: 'ምኽሪ ምርካብ ዕቃ',
+    qq_ev_sales: 'ሽያጥ EV ምዕባይ',
+    qq_promotions: 'ምስትብሃል',
+    qq_payment_trends: 'ኣዝማምያ ክፍሊት',
+    qq_pricing: 'ምኽሪ ዋጋ',
+    qq_promo_strategy: '💡 ስትራቴጂ ምስትብሃል',
+    qq_consign_analysis: '🤝 ትንተና ኮንሲኝምንት',
+    coach_greeting: '👋 ሰላም! ኣነ ኣማኻሪ ቢዝነስ ናይ 2M Smart Spare ኢየ። ዝርዝር ዕቃኹም፣ ኣዝማምያ ሽያጥ፣ ከምኡ'ውን ዕዳጋ ተቀያያሪ ክፋል መኪና ኢትዮጵያ — ምዕባለ EV ዘጠቓልል — ይፈልጥ ኢየ።<br><br>ዝደሊ ሕተቱ!',
+    coach_input_placeholder: 'ኣማኻሪኹም ሕተቱ…',
+    coach_send: 'ላኣኽ',
+    cs_title: '🤝 ዕቃ ኮንሲኝምንት',
+    cs_total_items: 'ጠቕላላ ዕቃ ኮንሲኝምንት',
+    cs_gross_value: 'ጠቕላላ ዋጋ ኮንሲኝምንት',
+    cs_commission: 'ኮሚሽን ዱኳን',
+    cs_owed: 'ንኣቕረብቲ ዝኽፈል',
+    cs_generate_report: '📋 ጸብጻብ ምስፍሓፍ ምፍጣር',
+    pay_chapa_link: '💳 ሊንክ ክፍሊት Chapa',
+    pay_amount_placeholder: 'መጠን (ETB)',
+    pay_desc_placeholder: 'መግለጺ',
+    pay_with_chapa: 'ብ CHAPA ክፈል',
+    pay_scan: 'ንምኽፋል Scan ግበር',
+    pay_subscription: '📦 ምዝጋብ ፕላትፎርም',
+    pay_subscribe_btn: 'ምዝጋብ ክፈል ▶',
+    toast_sale_ok: '✅ ሽያጥ ተመዝጊቡ!',
+    toast_settle_copied: '📋 ጸብጻብ ተቐዲሑ!',
+    toast_enter_amount: '⚠️ መጠን ኣእቱ',
+    toast_chapa_open: '💳 Chapa checkout ይኸፈት ኣሎ…',
+    toast_chapa_config: '⚠️ CHAPA_SECRET_KEY ኣዋድድ',
+    tier_basic_desc: 'ርክብ bot + ዕለታዊ ጸብጻባት',
+    tier_standard_desc: 'መሰረታዊ + AI መምህር + ኣዝማምያ',
+    tier_premium_desc: 'ኩሉ ባህርያት + ኮንሲኝምንት',
+    tier_mo: 'ETB/ወርሒ',
+    ai_thinking: '⏳ AI ይምክር ኣሎ…',
+    ai_error_api: '⚠️ ጌጋ API: ',
+    ai_error_key: '\n\nCLAUDE_API_KEY ኣዋድድ።',
+    ai_error_reach: '⚠️ AI ኣምኻሪ ኣይተረኽበን። API key ከም ዝተሓዘ ርግጸኛ ኩን።',
+  }
+};
+
+function t(key) {
+  const lang = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+  return lang[key] || TRANSLATIONS['en'][key] || key;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  const map = { en: 0, am: 1, om: 2, ti: 3 };
+  const btns = document.querySelectorAll('.lang-btn');
+  if (btns[map[lang]]) btns[map[lang]].classList.add('active');
+
+  // Apply translations to all tagged elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    // Use innerHTML for elements that might contain <br> tags
+    if (key === 'coach_greeting') {
+      el.innerHTML = val;
+    } else {
+      el.textContent = val;
+    }
+  });
+
+  // Placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+
+  // Tab buttons (contain emoji + text)
+  document.querySelectorAll('[data-i18n-tab]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n-tab'));
+  });
+
+  // Re-render dynamic sections to pick up translated strings
+  renderDashboard();
+  if (document.getElementById('tab-inventory').classList.contains('active')) renderInventory();
+  if (document.getElementById('tab-consignment').classList.contains('active')) renderConsignment();
+  if (document.getElementById('tab-payment').classList.contains('active')) renderPaymentTab();
+
+  // Update select placeholder if sale-product is visible
+  const selProd = document.getElementById('sale-product');
+  if (selProd && selProd.options[0]) selProd.options[0].text = t('sale_select_product');
+}
+
+// Override showToast to use translated strings
+const _origShowToast = window.showToast;
+
+// Patch SUBSCRIPTION_TIERS descriptions after they're rendered
+const _origRenderPaymentTab = window.renderPaymentTab;
 
 // ═══════════════════════════════════════════════════════════════
 // CHAPA PAYMENT & QR CODE
@@ -1811,17 +2256,18 @@ let qrInstance    = null;
 let chapaLinkUrl  = '';
 
 function renderPaymentTab() {
-  // Build subscription tiers
+  // Build subscription tiers with translated descriptions
+  const tierDescKeys = { basic: 'tier_basic_desc', standard: 'tier_standard_desc', premium: 'tier_premium_desc' };
   const tiersEl = document.getElementById('sub-tiers');
-  tiersEl.innerHTML = SUBSCRIPTION_TIERS.map(t => `
-    <div class="sub-tier-card" id="tier-${t.key}" onclick="selectTier('${t.key}')">
+  tiersEl.innerHTML = SUBSCRIPTION_TIERS.map(tier => `
+    <div class="sub-tier-card" id="tier-${tier.key}" onclick="selectTier('${tier.key}')">
       <div>
-        <div class="sub-tier-name">${t.label}</div>
-        <div class="sub-tier-desc">${t.desc}</div>
+        <div class="sub-tier-name">${tier.label}</div>
+        <div class="sub-tier-desc">${t(tierDescKeys[tier.key])}</div>
       </div>
       <div style="text-align:right">
-        <div class="sub-tier-price">${t.price.toLocaleString()}</div>
-        <div class="sub-tier-mo">ETB/month</div>
+        <div class="sub-tier-price">${tier.price.toLocaleString()}</div>
+        <div class="sub-tier-mo">${t('tier_mo')}</div>
       </div>
     </div>
   `).join('');
@@ -1839,7 +2285,7 @@ function selectTier(key) {
   updateQR();
 
   document.getElementById('sub-status').textContent =
-    `✅ ${selectedTier.label} selected — ${selectedTier.price.toLocaleString()} ETB/month`;
+    `✅ ${selectedTier.label} — ${selectedTier.price.toLocaleString()} ${t('tier_mo')}`;
 }
 
 let qrUpdateTimer = null;
@@ -1887,15 +2333,15 @@ function _doUpdateQR() {
 function openChapaLink() {
   const amount = parseFloat(document.getElementById('chapa-amount').value) || 0;
   if (!amount) {
-    showToast('⚠️ Enter an amount first', 'amber');
+    showToast(t('toast_enter_amount'), 'amber');
     return;
   }
   // In production, call /api/chapa_init to get a real checkout URL from your Flask server
   if (chapaLinkUrl) {
     window.open(chapaLinkUrl, '_blank');
-    showToast('💳 Opening Chapa checkout…', 'green');
+    showToast(t('toast_chapa_open'), 'green');
   } else {
-    showToast('⚠️ Configure CHAPA_SECRET_KEY in .env to enable live payments', 'amber');
+    showToast(t('toast_chapa_config'), 'amber');
   }
 }
 
@@ -1908,7 +2354,7 @@ function subscribePlan() {
   setTimeout(() => {
     openChapaLink();
   }, 500);
-  showToast(`📦 Subscribing to ${selectedTier.label} plan…`, 'green');
+  showToast(`📦 ${t('tab_payment')}: ${selectedTier.label}…`, 'green');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1925,7 +2371,7 @@ async function sendCoach() {
   input.value = '';
 
   addMsg(q, 'user');
-  const thinking = addMsg('⏳ Consulting the AI…', 'thinking');
+  const thinking = addMsg(t('ai_thinking'), 'thinking');
 
   const prods   = getProducts();
   const monthly = getSalesForPeriod('monthly');
@@ -1980,13 +2426,15 @@ ${csLines || 'None logged'}`;
     if (data.content && data.content[0]) {
       addMsg(data.content[0].text, 'bot');
     } else if (data.error) {
-      addMsg(`⚠️ API error: ${data.error.message}\n\nSet CLAUDE_API_KEY in the bot's .env file.`, 'bot');
+      addMsg(t('ai_error_api') + data.error.message + t('ai_error_key'), 'bot');
     }
   } catch (e) {
     thinking.remove();
-    addMsg('⚠️ Could not reach the AI Coach. Make sure your API key is configured and the bot server is running.', 'bot');
+    addMsg(t('ai_error_reach'), 'bot');
   }
 }
+// Initialize i18n on load (English default, applies data-i18n attributes)
+window.addEventListener('DOMContentLoaded', () => { setLang('en'); });
 </script>
 </body>
 </html>
